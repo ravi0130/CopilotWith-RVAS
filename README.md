@@ -4,6 +4,10 @@ An interactive RVAS for showing how CopilotWith turns a complex legacy estate in
 
 The experience lets a presenter replay an anonymised discovery mission, inspect the programme topology, meet the specialist agents, compare accelerator packs, filter evidence by confidence, and make a human stage-gate decision.
 
+## Live RVAS
+
+Open the hosted experience at [https://ravi0130.github.io/CopilotWith-RVAS/](https://ravi0130.github.io/CopilotWith-RVAS/).
+
 ## What the demo shows
 
 - A timed mission replay that reveals findings as agents work
