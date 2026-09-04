@@ -17,18 +17,30 @@ The following concepts are adapted from the CopilotWith repository and its gover
 
 Primary source areas used during authoring were the root `AGENTS.md`, the starter pack, middleware displacement pack, application modernisation pack, reverse-engineering pack, and their sample outputs.
 
+## Repository-grounded estate facts
+
+The story adapts the following facts from `21-middleware-displacement/sample-output/02-documentation/00-Executive-Summary.md` in the CopilotWith repository:
+
+- 16 catalogued integrations
+- 1,994 source artefacts, calculated from the documented file-type breakdown
+- Nine technologies in scope
+- A9_Sales feeding eight downstream consumers directly
+- No runtime evidence for any interface
+- I3248 having no documented business purpose
+- The strategic choice to migrate A9_Sales first or last
+
+These facts are replayed from repository sample outputs. They are not generated from the audience's estate at runtime.
+
 ## Illustrative demo content
 
-The following are synthetic or anonymised narrative devices held in `src/data.ts`:
+The following are anonymised or synthetic narrative devices held in `src/App.tsx`:
 
 - `Contoso Retail`
-- The timed six-event mission replay
-- The estate topology and node relationships
-- Counts such as 1,994 artefacts, 16 integrations, and nine technologies
-- Risk and evidence scores
-- Migration-wave statements and expected outcomes
+- The timed estate-map reveal and simplified node layout
+- The SME statement that I3248 is a month-end finance scorecard
+- The bounded slice, proof details, stage-gate record, and three-wave outcome
 
-These values create a coherent demonstration and are not generated from the current repository at runtime.
+These devices make the evidence and governance model tangible; they must not be presented as measured customer results.
 
 ## Presenter rules
 

@@ -2,27 +2,26 @@
 
 ## Current shape
 
-Mission Control is a client-side React application. The UI reads a typed, in-memory programme model and owns only presentation state: selected view, selected agent and node, replay progress, evidence filter, and gate response.
+The RVAS is a client-side React application. `src/App.tsx` contains the small illustrative estate model and owns presentation state for chapter progression, the selected system, scan reveal, SME intervention, strategy choice, proof disclosure, and human approval.
 
 ```mermaid
 flowchart LR
-    D[Typed demo model] --> A[React experience shell]
-    A --> M[Mission replay]
-    A --> T[Programme twin]
-    A --> X[Agent and pack explorer]
-    A --> G[Human stage gate]
-    M --> E[Evidence stream]
-    T --> E
+    D[Repository-grounded demo facts] --> S[Seven-chapter story]
+    S --> M[Estate map]
+    S --> E[Evidence gap]
+    S --> C[Human choice]
+    S --> P[Bounded slice and proof]
+    P --> G[Human stage gate]
+    G --> W[Programme waves]
 ```
 
 The implementation is deliberately small:
 
-- `src/data.ts` defines agents, evidence events, estate nodes, links, and packs.
-- `src/App.tsx` coordinates views and interactions.
+- `src/App.tsx` defines the demo model and coordinates chapters and interactions.
 - `src/App.css` contains the responsive component system.
 - `src/index.css` contains global theme tokens and foundations.
 
-No backend, authentication, telemetry, or customer data connection is included in this MVP.
+No backend, authentication, telemetry, or customer data connection is included in this MVP. A live implementation should extract a versioned model contract and populate it through adapters.
 
 ## Live accelerator target
 
@@ -35,7 +34,7 @@ flowchart LR
     S --> N[Evidence normaliser]
     N --> P[(Programme evidence store)]
     P --> API[Mission Control API]
-    API --> UI[Interactive RVAS]
+    API --> UI[Interactive customer story]
     UI --> H[Human approval service]
     H --> P
     P --> EP[Evidence pack export]

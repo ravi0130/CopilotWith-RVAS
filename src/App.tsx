@@ -1,205 +1,235 @@
 import { useEffect, useState } from 'react'
 import {
-  Activity, ArrowRight, Bot, Boxes, Check, ChevronRight, CircleHelp,
-  FileCheck2, GitBranch, Menu, Network, Pause, Play, Radar, RotateCcw,
-  Search, ShieldCheck, Sparkles, Target, UserCheck, X, Zap,
+  ArrowLeft, ArrowRight, Bot, Boxes, Check, ChevronRight, CircleAlert,
+  FileCheck2, GitPullRequest, Menu, Network, Play, ShieldCheck,
+  Sparkles, UserCheck, X, Zap,
 } from 'lucide-react'
-import { agents, evidenceEvents, links, nodes, packs, type Confidence } from './data'
+import heroAsset from './assets/hero.png'
 import './App.css'
 
-type Mode = 'briefing' | 'replay' | 'explore'
-type View = 'mission' | 'agents' | 'packs' | 'outcomes'
+const chapters = [
+  ['01', 'The fog'], ['02', 'The reveal'], ['03', 'The gap'], ['04', 'The choice'],
+  ['05', 'The slice'], ['06', 'The proof'], ['07', 'The scale'],
+]
+
+const interfaces = [
+  { id: 'a9', name: 'A9_Sales', kind: 'hub', x: 47, y: 48, evidence: 3, risk: 'CRITICAL' },
+  { id: 'pos', name: 'PoS systems', kind: 'source', x: 8, y: 22, evidence: 3, risk: 'MEDIUM' },
+  { id: 'esfa', name: 'ESFA', kind: 'simple', x: 82, y: 10, evidence: 3, risk: 'LOW' },
+  { id: 'i0659', name: 'I0659', kind: 'node', x: 88, y: 29, evidence: 3, risk: 'MEDIUM' },
+  { id: 'i0977', name: 'I0977', kind: 'node', x: 88, y: 48, evidence: 4, risk: 'MEDIUM' },
+  { id: 'i1092', name: 'I1092', kind: 'node', x: 88, y: 67, evidence: 3, risk: 'MEDIUM' },
+  { id: 'sagg', name: 'Sales aggregation', kind: 'node', x: 75, y: 86, evidence: 3, risk: 'MEDIUM' },
+  { id: 'idt', name: 'Sales IDT', kind: 'simple', x: 48, y: 89, evidence: 3, risk: 'LOW' },
+  { id: 'adapter', name: 'InsertSAGG', kind: 'node', x: 23, y: 82, evidence: 3, risk: 'MEDIUM' },
+  { id: 'i1804', name: 'I1804', kind: 'node', x: 9, y: 65, evidence: 3, risk: 'HIGH' },
+]
+
+const links = interfaces.filter((item) => item.id !== 'a9').map((item) => ({ from: interfaces[0], to: item }))
+
+const agents = {
+  census: ['01', 'Estate census', 'Scans broadly, classifies the estate, and cites every finding.'],
+  analysis: ['02', 'Deep analysis', 'Reconstructs behaviour and separates evidence from inference.'],
+  design: ['03', 'Displacement designer', 'Turns validated evidence into options and trade-offs.'],
+  implementation: ['04', 'Slice implementer', 'Changes only the bounded scope a human approved.'],
+  governance: ['12', 'Governance', 'Verifies proof is present. It cannot approve its own progression.'],
+}
+
+function AgentBadge({ agent }: { agent: keyof typeof agents }) {
+  const [order, name, description] = agents[agent]
+  return <div className="agent-badge"><span>{order}</span><Bot size={18} /><div><strong>{name}</strong><small>{description}</small></div></div>
+}
 
 function App() {
-  const [mode, setMode] = useState<Mode>('replay')
-  const [view, setView] = useState<View>('mission')
-  const [selectedAgent, setSelectedAgent] = useState('discovery')
-  const [selectedNode, setSelectedNode] = useState('a9')
-  const [replayStep, setReplayStep] = useState(0)
-  const [playing, setPlaying] = useState(false)
-  const [confidence, setConfidence] = useState<Confidence | 'ALL'>('ALL')
-  const [gateState, setGateState] = useState<'waiting' | 'approved' | 'challenged'>('waiting')
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [chapter, setChapter] = useState(-1)
+  const [highestReached, setHighestReached] = useState(-1)
+  const [selected, setSelected] = useState('a9')
+  const [scan, setScan] = useState(0)
+  const [smeConfirmed, setSmeConfirmed] = useState(false)
+  const [strategy, setStrategy] = useState<'first' | 'last' | null>(null)
+  const [proofOpen, setProofOpen] = useState<number | null>(null)
+  const [approved, setApproved] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
-    if (!playing) return
-    const timer = window.setInterval(() => {
-      setReplayStep((step) => {
-        if (step >= evidenceEvents.length) {
-          setPlaying(false)
-          return step
-        }
-        return step + 1
-      })
-    }, 1050)
+    if (chapter !== 1 || scan >= 100) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const frame = window.requestAnimationFrame(() => setScan(100))
+      return () => window.cancelAnimationFrame(frame)
+    }
+    const timer = window.setInterval(() => setScan((value) => Math.min(100, value + 4)), 45)
     return () => window.clearInterval(timer)
-  }, [playing])
+  }, [chapter, scan])
 
-  const resetReplay = () => {
-    setReplayStep(0)
-    setGateState('waiting')
-    setPlaying(false)
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }))
+    return () => window.cancelAnimationFrame(frame)
+  }, [chapter])
+
+  const go = (next: number) => {
+    setChapter(next)
+    setMenuOpen(false)
   }
-  const changeView = (next: View) => {
-    setView(next)
-    setMobileOpen(false)
+
+  const resetStory = () => {
+    setChapter(-1)
+    setHighestReached(-1)
+    setSelected('a9')
+    setScan(0)
+    setSmeConfirmed(false)
+    setStrategy(null)
+    setProofOpen(null)
+    setApproved(false)
+    setMenuOpen(false)
   }
-  const visibleEvents = evidenceEvents.slice(0, replayStep)
-    .filter((event) => confidence === 'ALL' || event.confidence === confidence)
-  const agent = agents.find((item) => item.id === selectedAgent) ?? agents[1]
-  const node = nodes.find((item) => item.id === selectedNode) ?? nodes[2]
 
-  return (
-    <div className="app-shell">
-      <header className="topbar">
-        <button className="brand" onClick={() => changeView('mission')} aria-label="CopilotWith home">
-          <span className="brand-mark"><GitBranch size={18} /></span>
-          <span><strong>CopilotWith</strong><small>Modernisation Mission Control</small></span>
-        </button>
-        <nav className={mobileOpen ? 'nav open' : 'nav'} aria-label="Primary navigation">
-          {(['mission', 'agents', 'packs', 'outcomes'] as View[]).map((item) => (
-            <button key={item} className={view === item ? 'active' : ''} onClick={() => changeView(item)}>{item}</button>
-          ))}
-        </nav>
-        <div className="mode-switch" aria-label="Experience mode">
-          {(['briefing', 'replay', 'explore'] as Mode[]).map((item) => (
-            <button key={item} className={mode === item ? 'active' : ''} onClick={() => setMode(item)}>{item}</button>
-          ))}
-        </div>
-        <button className="icon-button mobile-menu" onClick={() => setMobileOpen((open) => !open)} aria-label="Toggle menu"><Menu /></button>
-      </header>
+  const next = () => {
+    const target = Math.min(6, chapter + 1)
+    setHighestReached((value) => Math.max(value, target))
+    go(target)
+  }
+  const startStory = () => {
+    setSelected('a9')
+    setScan(0)
+    setSmeConfirmed(false)
+    setStrategy(null)
+    setProofOpen(null)
+    setApproved(false)
+    setHighestReached(0)
+    go(0)
+  }
+  const back = () => go(Math.max(-1, chapter - 1))
+  const canAdvance = chapter !== 2 || smeConfirmed
+    ? chapter !== 3 || Boolean(strategy)
+      ? chapter !== 5 || approved
+      : false
+    : false
 
-      {view === 'mission' && <main>
-        <section className="hero-band">
-          <div className="hero-copy">
-            <div className="eyebrow"><span className="live-dot" /> {mode === 'replay' ? 'REPLAY · ANONYMISED CUSTOMER PATTERN' : mode.toUpperCase()}</div>
-            <h1>Turn legacy uncertainty into a governed modernisation programme.</h1>
-            <p>Watch specialist agents discover an estate, connect evidence, expose unknowns, and prepare safe decisions while people remain in control.</p>
-            <div className="hero-actions">
-              <button className="primary" onClick={() => { resetReplay(); setPlaying(true); setMode('replay') }}><Play size={17} fill="currentColor" /> Run the mission</button>
-              <button className="secondary" onClick={() => changeView('agents')}><Bot size={17} /> Meet the agents</button>
-            </div>
-          </div>
-          <div className="pulse-panel" aria-label="Mission summary">
-            <div className="pulse-head"><span>CONTOSO RETAIL · INTEGRATION ESTATE</span><span className="status">REPLAY</span></div>
-            <div className="metric-grid">
-              <div><strong>{replayStep >= 2 ? '1,994' : '—'}</strong><span>artefacts scanned</span></div>
-              <div><strong>{replayStep >= 3 ? '16' : '—'}</strong><span>interfaces found</span></div>
-              <div><strong>{replayStep >= 3 ? '9' : '—'}</strong><span>technologies</span></div>
-              <div><strong>{replayStep >= 4 ? '8' : '—'}</strong><span>hub consumers</span></div>
-            </div>
-            <div className="scan-line"><span style={{ width: `${(replayStep / evidenceEvents.length) * 100}%` }} /></div>
-            <p><Activity size={15} /> {replayStep === 0 ? 'Ready to inspect the approved boundary' : replayStep < 6 ? evidenceEvents[replayStep - 1].title : 'Evidence pack ready for human review'}</p>
-          </div>
-        </section>
+  return <div className="story-shell">
+    <header className="story-nav">
+      <button className="wordmark" onClick={resetStory}><span><Network size={18} /></span><strong>CopilotWith</strong></button>
+      {chapter >= 0 && <nav className="chapter-progress" aria-label="Story chapters">
+        {chapters.map(([number, label], index) => <button key={number} disabled={index > highestReached} aria-current={index === chapter ? 'step' : undefined} className={index === chapter ? 'active' : index < highestReached ? 'done' : ''} onClick={() => go(index)}><span>{number}</span><small>{label}</small></button>)}
+      </nav>}
+      {chapter >= 0 && <button className="menu-button" onClick={() => setMenuOpen((value) => !value)} aria-label={menuOpen ? 'Close chapters' : 'Open chapters'} aria-expanded={menuOpen} aria-controls="mobile-chapters"><Menu /></button>}
+      {menuOpen && <nav className="mobile-chapters" id="mobile-chapters" aria-label="Story chapters">{chapters.map(([number, label], index) => <button key={number} disabled={index > highestReached} aria-current={index === chapter ? 'step' : undefined} onClick={() => go(index)}>{number} {label}</button>)}</nav>}
+      <span className="truth-label">ILLUSTRATIVE REPLAY · REPOSITORY-GROUNDED</span>
+    </header>
 
-        <section className="operating-strip">
-          {[
-            ['01', 'Discover', 'Find and classify'], ['02', 'Understand', 'Trace evidence'], ['03', 'Decide', 'Compare options'], ['04', 'Change', 'Bounded slices'], ['05', 'Prove', 'Verify and learn'],
-          ].map(([number, title, detail], index) => (
-            <div key={number} className={replayStep > index ? 'stage reached' : 'stage'}><span>{number}</span><div><strong>{title}</strong><small>{detail}</small></div>{index < 4 && <ChevronRight size={16} />}</div>
-          ))}
-        </section>
+    {chapter === -1 ? <Landing onStart={startStory} /> : <main className="chapter-stage">
+      {chapter === 0 && <FogChapter onNext={next} />}
+      {chapter === 1 && <RevealChapter scan={scan} selected={selected} onSelect={setSelected} onNext={next} />}
+      {chapter === 2 && <GapChapter confirmed={smeConfirmed} onConfirm={() => setSmeConfirmed(true)} onNext={next} />}
+      {chapter === 3 && <ChoiceChapter strategy={strategy} onChoose={(value) => { setStrategy(value); setProofOpen(null); setApproved(false); setHighestReached(3) }} onNext={next} />}
+      {chapter === 4 && <SliceChapter strategy={strategy} onNext={next} />}
+      {chapter === 5 && <ProofChapter open={proofOpen} onOpen={setProofOpen} approved={approved} onApprove={() => setApproved(true)} onNext={next} />}
+      {chapter === 6 && <ScaleChapter approved={approved} onRestart={resetStory} />}
+      <div className="story-controls"><button onClick={back}><ArrowLeft size={16} /> Back</button><span>{chapter + 1} / 7</span>{chapter < 6 && <button onClick={next} disabled={!canAdvance}>Next chapter <ArrowRight size={16} /></button>}</div>
+    </main>}
+  </div>
+}
 
-        <section className="workspace">
-          <aside className="agent-rail">
-            <div className="section-label">AGENT TEAM <span>{agents.length}</span></div>
-            {agents.map((item) => (
-              <button key={item.id} className={selectedAgent === item.id ? 'agent-row active' : 'agent-row'} onClick={() => setSelectedAgent(item.id)}>
-                <span className="agent-order">{item.order}</span><span><strong>{item.name}</strong><small>{item.role} · {item.verb}</small></span>
-                {evidenceEvents.slice(0, replayStep).some((event) => event.agentId === item.id) && <Check size={15} />}
-              </button>
-            ))}
-          </aside>
-
-          <div className="canvas-panel">
-            <div className="panel-head">
-              <div><span className="section-label">PROGRAMME TWIN</span><h2>Integration estate topology</h2></div>
-              <div className="legend"><span><i />Source</span><span><i className="hub" />Critical hub</span><span><i className="integration" />Integration</span></div>
-            </div>
-            <div className="topology">
-              <svg className="links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                {links.map(([from, to]) => {
-                  const a = nodes.find((item) => item.id === from)!
-                  const b = nodes.find((item) => item.id === to)!
-                  return <line key={`${from}-${to}`} x1={a.x + 3} y1={a.y + 3} x2={b.x + 3} y2={b.y + 3} />
-                })}
-              </svg>
-              {nodes.map((item) => (
-                <button key={item.id} className={`topology-node ${item.type} ${selectedNode === item.id ? 'selected' : ''} ${replayStep < 3 ? 'dormant' : ''}`}
-                  style={{ left: `${item.x}%`, top: `${item.y}%` }} onClick={() => setSelectedNode(item.id)} aria-label={`Inspect ${item.label}`}>
-                  <span>{item.type === 'hub' ? <Radar /> : item.type === 'source' ? <Boxes /> : item.type === 'target' ? <Target /> : <Zap />}</span>
-                  <strong>{item.label}</strong><small>L{item.evidence} · Risk {item.risk}</small>
-                </button>
-              ))}
-            </div>
-            <div className="node-inspector">
-              <div><span className="section-label">SELECTED ASSET</span><h3>{node.label}</h3><p>{node.note}</p></div>
-              <div className="tech-list">{node.technologies.map((tech) => <span key={tech}>{tech}</span>)}</div>
-              <div className="risk-meter"><span>Risk</span><div>{[1, 2, 3, 4, 5].map((level) => <i key={level} className={level <= node.risk ? 'filled' : ''} />)}</div></div>
-            </div>
-          </div>
-
-          <aside className="evidence-rail">
-            <div className="panel-head compact"><div><span className="section-label">EVIDENCE STREAM</span><h2>What the agents know</h2></div><span className="count">{replayStep}/6</span></div>
-            <div className="filter-row">
-              {(['ALL', 'OBSERVED', 'INFERRED', 'UNKNOWN'] as const).map((item) => <button key={item} className={confidence === item ? 'active' : ''} onClick={() => setConfidence(item)}>{item}</button>)}
-            </div>
-            <div className="event-list">
-              {visibleEvents.length === 0 && <div className="empty-state"><Search /><p>{replayStep === 0 ? 'Run the mission to reveal inspectable evidence.' : 'No evidence matches this filter.'}</p></div>}
-              {visibleEvents.map((event) => <article className="event" key={event.time}>
-                <div><time>{event.time}</time><span className={`confidence ${event.confidence.toLowerCase()}`}>{event.confidence}</span></div>
-                <h3>{event.title}</h3><p>{event.detail}</p>
-              </article>)}
-            </div>
-            <div className="replay-controls">
-              <button className="icon-button" onClick={resetReplay} title="Reset replay"><RotateCcw size={17} /></button>
-              <button className="primary play" onClick={() => replayStep >= evidenceEvents.length ? resetReplay() : setPlaying((state) => !state)}>{playing ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}{playing ? 'Pause' : replayStep >= 6 ? 'Replay' : 'Continue'}</button>
-            </div>
-          </aside>
-        </section>
-
-        <section className="agent-detail">
-          <div className="agent-identity"><span className="large-order">{agent.order}</span><div><span className="section-label">{agent.role.toUpperCase()} AGENT</span><h2>{agent.name}</h2><p>{agent.description}</p></div></div>
-          <div><span className="section-label">READS</span>{agent.reads.map((item) => <p className="capability" key={item}><ArrowRight size={14} />{item}</p>)}</div>
-          <div><span className="section-label">PRODUCES</span>{agent.produces.map((item) => <p className="capability" key={item}><FileCheck2 size={14} />{item}</p>)}</div>
-          <div className="boundary"><ShieldCheck /><div><span className="section-label">CONTROL BOUNDARY</span><p>{agent.boundary}</p></div></div>
-        </section>
-
-        <section className="gate-band">
-          <div className="gate-icon"><UserCheck /></div>
-          <div><span className="section-label">HUMAN STAGE GATE · G1</span><h2>Is the evidence sufficient to begin deep analysis?</h2><p>Runtime evidence and business ownership remain unresolved. The governance agent can verify readiness; only the customer approves progression.</p></div>
-          <div className="gate-actions">
-            {gateState === 'waiting' ? <><button className="secondary" onClick={() => setGateState('challenged')}><CircleHelp size={16} /> Request evidence</button><button className="primary" onClick={() => setGateState('approved')}><Check size={16} /> Approve bounded scope</button></> :
-              <div className={`gate-result ${gateState}`}><strong>{gateState === 'approved' ? 'Scope approved' : 'Evidence requested'}</strong><span>{gateState === 'approved' ? 'Decision recorded with conditions.' : 'Programme paused at Gate G1.'}</span><button onClick={() => setGateState('waiting')}><X size={14} /> Clear</button></div>}
-          </div>
-        </section>
-      </main>}
-
-      {view === 'agents' && <AgentsView onSelect={(id) => { setSelectedAgent(id); changeView('mission') }} />}
-      {view === 'packs' && <PacksView />}
-      {view === 'outcomes' && <OutcomesView />}
-      <footer><span>CopilotWith · Governed agentic modernisation</span><span>Replay data is illustrative and derived from anonymised repository samples · September 2026</span></footer>
+function Landing({ onStart }: { onStart: () => void }) {
+  return <main className="landing">
+    <div className="landing-copy">
+      <span className="kicker">A COPILOTWITH STORY</span>
+      <h1>Modernisation does not start with code.</h1>
+      <p className="landing-line">It starts with knowing <em>what is true.</em></p>
+      <p className="landing-intro">Enter a legacy integration estate where nobody can see the whole system. Watch a governed team of agents turn 1,994 scattered artefacts into one human-owned decision.</p>
+      <button className="story-cta" onClick={onStart}><Play size={18} fill="currentColor" /> Begin the 7-minute story</button>
+      <div className="landing-proof"><span>16 interfaces</span><span>9 technologies</span><span>12 specialist agents</span><span>1 human decision</span></div>
     </div>
-  )
+    <div className="landing-visual" aria-label="Legacy and evidence layers">
+      <img src={heroAsset} alt="Layered system visual" />
+      <div className="visual-label legacy"><span />LEGACY ESTATE</div>
+      <div className="visual-label evidence"><span />EVIDENCE LAYER</div>
+      <div className="signal s1" /><div className="signal s2" /><div className="signal s3" />
+      <p>Thousands of files.<br />No shared truth.</p>
+    </div>
+  </main>
 }
 
-function AgentsView({ onSelect }: { onSelect: (id: string) => void }) {
-  return <main className="library-page"><div className="library-intro"><span className="eyebrow">THE GOVERNED TEAM</span><h1>Specialists with explicit jobs, evidence, and boundaries.</h1><p>Each agent owns one part of the programme. No agent can discover, decide, implement, review, and approve its own work.</p></div><div className="agent-grid">{agents.map((agent) => <button key={agent.id} className="agent-card" onClick={() => onSelect(agent.id)}><div><span>{agent.order}</span><Bot /></div><small>{agent.role}</small><h2>{agent.name}</h2><p>{agent.description}</p><strong>{agent.verb} <ArrowRight size={15} /></strong></button>)}</div></main>
+function FogChapter({ onNext }: { onNext: () => void }) {
+  return <section className="story-grid fog-chapter">
+    <div className="narrative"><span className="beat">01 · THE FOG</span><h1>Sixteen integrations.<br />Nobody sees the system.</h1><p>Contoso Retail's sales estate has grown across IBM MQ, ACE, DataStage, DB2, Sterling B2B, SFTP, Oracle, and REST. Every team owns a piece. No one owns the picture.</p><AgentBadge agent="census" /><button className="story-cta" onClick={onNext}>Let the agents look <ArrowRight size={17} /></button></div>
+    <div className="fog-visual">
+      <div className="file-cloud">{['1,470 MQSC', '198 ESQL', '60 flows', '218 scripts', '39 XML', '9 SQL'].map((item, index) => <span key={item} style={{ '--i': index } as React.CSSProperties}>{item}</span>)}</div>
+      <div className="fog-statement"><CircleAlert /><strong>One failure can cascade across the estate.</strong><small>But the dependency path is buried across 1,994 artefacts.</small></div>
+    </div>
+  </section>
 }
 
-function PacksView() {
-  return <main className="library-page"><div className="library-intro"><span className="eyebrow">SCENARIO ACCELERATORS</span><h1>One governance model. Many modernisation missions.</h1><p>Agent packs adapt the common spine to a technology, estate, or transformation problem.</p></div><div className="pack-list">{packs.map(([name, count, maturity], index) => <article key={name}><span className="pack-index">0{index + 1}</span><div><h2>{name}</h2><p>{count} · {maturity}</p></div><Network /><ChevronRight /></article>)}</div></main>
+function RevealChapter({ scan, selected, onSelect, onNext }: { scan: number; selected: string; onSelect: (id: string) => void; onNext: () => void }) {
+  const current = interfaces.find((item) => item.id === selected) ?? interfaces[0]
+  return <section className="reveal-chapter">
+    <div className="chapter-heading"><div><span className="beat">02 · THE REVEAL</span><h1>The files become a living map.</h1></div><AgentBadge agent="census" /></div>
+    <div className="reveal-layout">
+      <div className="estate-map">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">{links.map(({ from, to }) => <line key={to.id} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />)}</svg>
+        {interfaces.map((item, index) => <button key={item.id} disabled={scan < index * 8} className={`${item.kind} ${selected === item.id ? 'selected' : ''}`} style={{ left: `${item.x}%`, top: `${item.y}%` }} onClick={() => onSelect(item.id)}><span>{item.name}</span><small>L{item.evidence}</small></button>)}
+        <div className="scan-beam" style={{ left: `${scan}%` }} />
+      </div>
+      <aside className="asset-story"><span className={`risk ${current.risk.toLowerCase()}`}>{current.risk} RISK</span><h2>{current.name}</h2>{current.id === 'a9' ? <><p>The central point-of-sale hub spans four platforms and feeds eight downstream consumers.</p><div className="big-number"><strong>8+</strong><span>direct consumers</span></div><div className="tech-row"><span>ACE</span><span>MQ</span><span>DataStage</span><span>DB2</span></div></> : <><p>One part of the connected estate, now visible with its evidence level and relationship to the critical hub.</p><div className="big-number"><strong>L{current.evidence}</strong><span>evidence level</span></div></>}<button className="story-cta" onClick={onNext}>Look beneath the map <ArrowRight size={17} /></button></aside>
+    </div>
+  </section>
 }
 
-function OutcomesView() {
-  const outcomes = [
-    ['Unknown → Legible', 'Build an evidence-linked view of systems, interfaces, rules, risks, and ownership.'],
-    ['Spreadsheet → Programme twin', 'Keep topology, findings, migration waves, and decisions connected as the estate changes.'],
-    ['Big bang → Bounded slices', 'Implement one approved, reversible change at a time behind test and human gates.'],
-    ['Opinion → Defensible evidence', 'Separate observed facts, inferences, assumptions, unknowns, and SME confirmation.'],
-  ]
-  return <main className="library-page"><div className="library-intro"><span className="eyebrow">THE PROGRAMME SHIFT</span><h1>Move from estate archaeology to evidence-led change.</h1><p>Value comes from making uncertainty, dependencies, decisions, and delivery evidence visible as one continuous system.</p></div><div className="outcome-grid">{outcomes.map(([title, text], index) => <article key={title}><span>0{index + 1}</span><Sparkles /><h2>{title}</h2><p>{text}</p></article>)}</div></main>
+function GapChapter({ confirmed, onConfirm, onNext }: { confirmed: boolean; onConfirm: () => void; onNext: () => void }) {
+  return <section className="gap-chapter">
+    <div className="chapter-heading"><div><span className="beat">03 · THE GAP</span><h1>A map is not the truth.</h1><p>The agents found structure. They also found the edge of their knowledge.</p></div><AgentBadge agent="analysis" /></div>
+    <div className="evidence-board" role="table" aria-label="Evidence confidence matrix">
+      <div className="evidence-columns" role="row"><span role="columnheader">Finding</span><span role="columnheader">Source</span><span role="columnheader">Runtime</span><span role="columnheader">SME</span><span role="columnheader">Confidence</span></div>
+      {[
+        ['16 interfaces exist', true, false, false, 'OBSERVED'],
+        ['A9 feeds 8+ consumers', true, false, false, 'INFERRED'],
+        ['I3248 can be retired', true, false, confirmed, confirmed ? 'SME-CONFIRMED' : 'UNKNOWN'],
+        ['Current SLAs are preserved', false, false, false, 'UNKNOWN'],
+      ].map(([finding, source, runtime, sme, confidence]) => <div className="evidence-row" role="row" key={String(finding)}><strong role="cell">{finding}</strong><CheckCell label="Source evidence" yes={Boolean(source)} /><CheckCell label="Runtime evidence" yes={Boolean(runtime)} /><CheckCell label="SME evidence" yes={Boolean(sme)} /><span role="cell" className={`confidence ${String(confidence).toLowerCase()}`}>{confidence}</span></div>)}
+    </div>
+    <div className={`sme-moment ${confirmed ? 'confirmed' : ''}`}><UserCheck /><div><span>YOUR TURN · DOMAIN OWNER</span><h2>{confirmed ? 'I3248 is a month-end finance scorecard.' : 'The agents cannot identify I3248.'}</h2><p>{confirmed ? 'Your context has changed the record from UNKNOWN to SME-CONFIRMED. It cannot be retired.' : 'MQ configuration exists, but purpose, direction, ownership, and consumers are absent. Is this obsolete, or critical?'}</p></div>{confirmed ? <button className="story-cta" onClick={onNext}>Carry the truth forward <ArrowRight size={17} /></button> : <button className="story-cta" onClick={onConfirm}><UserCheck size={17} /> Add SME knowledge</button>}</div>
+  </section>
+}
+
+function CheckCell({ yes, label }: { yes: boolean; label: string }) { return <span role="cell" aria-label={`${label}: ${yes ? 'present' : 'not present'}`} className={yes ? 'yes' : 'no'}>{yes ? <Check size={16} aria-hidden="true" /> : <X size={16} aria-hidden="true" />}</span> }
+
+function ChoiceChapter({ strategy, onChoose, onNext }: { strategy: 'first' | 'last' | null; onChoose: (value: 'first' | 'last') => void; onNext: () => void }) {
+  return <section className="choice-chapter">
+    <div className="chapter-heading"><div><span className="beat">04 · THE CHOICE</span><h1>The machine finds the decision.<br />A human makes it.</h1></div><AgentBadge agent="design" /></div>
+    <div className="decision-line"><div className="decision-source"><Zap /><strong>A9_Sales</strong><span>Critical hub</span></div><div className="fork"><span /></div><button className={strategy === 'first' ? 'decision-card selected' : 'decision-card'} onClick={() => onChoose('first')}><small>OPTION A</small><h2>Migrate the hub first</h2><p>Clear the critical path early, but take maximum complexity before the delivery pattern is proven.</p><div><span>Early risk retirement</span><strong>Higher first move</strong></div></button><button className={strategy === 'last' ? 'decision-card selected' : 'decision-card'} onClick={() => onChoose('last')}><small>OPTION B · RECOMMENDED</small><h2>Prove, then migrate the hub</h2><p>Learn on low-blast-radius consumers, then move A9 with evidence from the earlier slices.</p><div><span>Pattern proven first</span><strong>Risk remains longer</strong></div></button></div>
+    <div className="human-rule"><ShieldCheck /><p><strong>CopilotWith recommends. It does not decide.</strong> The wave plan changes only after the programme owner records a choice.</p><button disabled={!strategy} className="story-cta" onClick={onNext}>{strategy ? `Record: ${strategy === 'last' ? 'prove first' : 'hub first'}` : 'Choose a strategy'} <ArrowRight size={17} /></button></div>
+  </section>
+}
+
+function SliceChapter({ strategy, onNext }: { strategy: 'first' | 'last' | null; onNext: () => void }) {
+  const proveFirst = strategy !== 'first'
+  return <section className="slice-chapter">
+    <div className="chapter-heading"><div><span className="beat">05 · THE SLICE</span><h1>Not a migration project.<br />One reversible move.</h1></div><AgentBadge agent="implementation" /></div>
+    <div className="slice-board"><div className="slice-focus"><div className="slice-icon"><Boxes /></div><span>APPROVED SLICE 01</span><h2>{proveFirst ? 'ESFA consumer' : 'A9_Sales hub foundation'}</h2><p>{proveFirst ? 'A simple DataStage consumer validates the target pattern without disturbing the critical sales hub.' : 'The programme begins with the hub foundation, isolated behind parallel routing and rollback controls.'}</p></div><div className="scope-columns"><div><span>IN SCOPE</span>{['Reconstruct input contract', 'Build target workflow', 'Run old and new in parallel', 'Compare every output'].map((item) => <p key={item}><Check />{item}</p>)}</div><div><span>OUT OF SCOPE</span>{['Legacy decommissioning', 'Downstream redesign', 'Production routing switch', 'Unapproved dependencies'].map((item) => <p key={item}><X />{item}</p>)}</div></div><div className="pr-rail"><GitPullRequest /><div><small>PR #001</small><strong>Bounded. Reviewable. Reversible.</strong></div><ChevronRight /><span>Human review</span></div></div>
+    <button className="story-cta chapter-cta" onClick={onNext}>Put the slice on trial <ArrowRight size={17} /></button>
+  </section>
+}
+
+const proofItems = [
+  ['Contract reconstructed', '15 message types and eight transformations traced to source evidence.'],
+  ['Parallel run observed', 'Seven-day comparison completed; outliers remain visible for review.'],
+  ['Security controls checked', 'Identity, secrets, logging, and target access boundaries inspected.'],
+  ['Rollback exercised', 'Legacy routing restored inside the agreed recovery window.'],
+]
+
+function ProofChapter({ open, onOpen, approved, onApprove, onNext }: { open: number | null; onOpen: (index: number | null) => void; approved: boolean; onApprove: () => void; onNext: () => void }) {
+  return <section className="proof-chapter">
+    <div className="chapter-heading"><div><span className="beat">06 · THE PROOF · ILLUSTRATIVE REPLAY</span><h1>Progress is earned with evidence.</h1><p>These example checks show the proof a live engagement would need to supply.</p></div><AgentBadge agent="governance" /></div>
+    <div className="proof-layout"><div className="proof-list">{proofItems.map(([title, detail], index) => <button key={title} onClick={() => onOpen(open === index ? null : index)} className={open === index ? 'open' : ''} aria-expanded={open === index} aria-controls={`proof-detail-${index}`}><FileCheck2 /><div><strong>{title}</strong>{open === index && <p id={`proof-detail-${index}`}>{detail}</p>}</div><span>PASS</span><ChevronRight /></button>)}</div><aside className={`approval-panel ${approved ? 'approved' : ''}`}><UserCheck /><span>STAGE GATE · G6</span><h2>{approved ? 'Approved to progress.' : 'Agents have finished checking.'}</h2><p>{approved ? 'The human decision, conditions, evidence set, and timestamp are now part of the programme record.' : 'The governance agent reports that required proof is present. It cannot merge the change or accept the risk.'}</p>{approved ? <button className="story-cta" onClick={onNext}>See what scales <ArrowRight /></button> : <button className="story-cta" onClick={onApprove}><UserCheck /> Human approval</button>}</aside></div>
+  </section>
+}
+
+function ScaleChapter({ approved, onRestart }: { approved: boolean; onRestart: () => void }) {
+  return <section className="scale-chapter">
+    <div className="scale-copy"><span className="beat">07 · THE SCALE</span><h1>The first slice does more than move an interface.</h1><p>It turns assumptions into observed delivery evidence. That evidence improves the next estimate, the next sequence, and the next decision.</p></div>
+    <div className="before-after"><div><span>BEFORE</span><strong>1,994</strong><p>scattered artefacts</p><small>Unknown ownership · hidden coupling · no common evidence</small></div><ArrowRight /><div className="after"><span>AFTER ONE SLICE</span><strong>{approved ? '1' : '0'}</strong><p>proven delivery pattern</p><small>Visible estate · bounded change · human-owned decision trail</small></div></div>
+    <div className="wave-story"><div><span>WAVE 01 · PROVE</span><strong>ESFA</strong><small>Low blast radius</small></div><ChevronRight /><div><span>WAVE 02 · LEARN</span><strong>I0977 + Sales IDT</strong><small>Reuse observed pattern</small></div><ChevronRight /><div className="critical-wave"><span>WAVE 03 · TRANSFORM</span><strong>A9_Sales</strong><small>Move the hub with evidence</small></div></div>
+    <div className="closing"><Sparkles /><div><h2>That is CopilotWith.</h2><p>Not AI writing code in isolation. A governed operating model that makes the estate visible, uncertainty explicit, changes reversible, and every consequential decision human.</p></div><button className="story-cta" onClick={onRestart}>Replay the story</button></div>
+  </section>
 }
 
 export default App

@@ -1,56 +1,47 @@
-# Customer Demo Script
+# Seven-Minute Customer Story
 
-This walkthrough takes about seven minutes. Keep the conversation on customer decisions and evidence, rather than presenting the interface as a feature catalogue.
+Keep the conversation on uncertainty, decisions, and proof. This is an anonymised pattern adapted from CopilotWith sample outputs, not a live scan of the audience's estate.
 
-## 1. Frame the problem - 45 seconds
+## 1. The Fog - 45 seconds
 
-Open **Mission** in Replay mode.
+> Modernisation does not start with code. It starts with knowing what is true.
 
-> Modernisation usually begins with fragmented evidence and confident opinions. CopilotWith gives us a governed team of specialist agents that can investigate the estate, show what they know, and stop where people must decide.
+Begin the story. Contrast 16 integrations with 1,994 scattered artefacts and ask who owns the complete picture today.
 
-Point out that the replay is an anonymised customer pattern, not a live scan.
+## 2. The Reveal - 60 seconds
 
-## 2. Run the mission - 90 seconds
+Let the census agent reveal the map. Select **A9_Sales** and call out its four platforms and eight direct consumers.
 
-Select **Run the mission**. Let the first four events appear.
+> CopilotWith makes the estate discussable before it makes it changeable.
 
-Call out:
+## 3. The Gap - 60 seconds
 
-- The boundary is confirmed before discovery starts.
-- Inventory facts are separated from inferred risk.
-- The programme twin becomes navigable as evidence arrives.
-- Selecting a node reveals its technologies, risk, and current evidence level.
+Show the evidence matrix. Source evidence exists, runtime evidence does not, and I3248 remains `UNKNOWN`. Select **Add SME knowledge**.
 
-Pause on **A9_Sales** and ask: “Would this be the place your teams expect the largest blast radius?”
+> The agent stops at the boundary of its evidence. A domain owner changes the record to `SME-CONFIRMED`.
 
-## 3. Challenge the evidence - 60 seconds
+## 4. The Choice - 75 seconds
 
-Filter the stream by **OBSERVED**, then **UNKNOWN**.
+Compare moving A9 first with proving the pattern on a lower-risk consumer. Choose **Prove, then migrate the hub**, then record the decision.
 
-> The accelerator does not turn every agent statement into truth. It keeps observed facts, inferences, assumptions, and unknowns visibly different so the programme can act with appropriate confidence.
+> CopilotWith recommends. It does not decide. The programme changes only when a human records the choice.
 
-Use **Request evidence** at Gate G1 to show that the programme can pause without losing its state.
+## 5. The Slice - 60 seconds
 
-## 4. Meet the team - 90 seconds
+Show the explicit in-scope and out-of-scope lists and the pull-request rail.
 
-Open **Agents** and choose two roles relevant to the audience. Return to Mission to inspect their inputs, outputs, and control boundaries.
+> The programme does not leap from assessment to transformation. It makes one bounded, reviewable, reversible move.
 
-Useful pairings:
+## 6. The Proof - 75 seconds
 
-- Architecture audience: Estate Census and Displacement Designer
-- Delivery audience: Slice Implementer and Quality Verifier
-- Risk audience: Evidence Curator and Governance Gate
+Expand the contract, parallel-run, security, and rollback evidence. Select **Human approval**, then **See what scales**.
 
-Emphasise that no agent merges, deploys, accepts risk, or approves its own progression.
+> Specialist agents can report that proof is present. They cannot merge the change, accept risk, or approve their own progression.
 
-## 5. Expand the conversation - 60 seconds
+## 7. The Scale - 45 seconds
 
-Open **Packs** to show that the governed operating model can be specialised for middleware displacement, application modernisation, reverse engineering, COBOL, and data scenarios.
+Connect one proven delivery pattern to the three-wave sequence: prove, learn, transform.
 
-Open **Outcomes** to move from agent activity to customer value: a visible estate, defensible decisions, bounded changes, and reusable evidence.
+> CopilotWith is not AI writing code in isolation. It is a governed operating model that makes uncertainty explicit and consequential decisions human.
 
-## 6. Close on the live version - 45 seconds
-
-> Today this is a replay driven by an in-memory programme model. The next step is to connect the same experience to your repositories and agent runs, so every node and finding links back to customer-owned evidence and every gate becomes an auditable decision.
-
-Ask which estate, decision, and approval gate would make the most valuable first customer-specific mission.
+Close by asking which estate, unresolved decision, and human gate would make the most valuable customer-specific first story.
