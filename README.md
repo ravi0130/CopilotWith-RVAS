@@ -1,33 +1,36 @@
-# CopilotWith: From Fog to Proof
+# CopilotWith Modernisation Mission Control
 
-An interactive RVAS that tells one customer story: how CopilotWith turns fragmented estate evidence into a bounded, human-owned modernisation decision. It is designed for live customer conversations, not as a feature catalogue or a static product page.
+An interactive customer accelerator that makes application modernisation feel like a live, governed engineering mission. Select an application, materialise its topology, inspect blockers, activate specialist agents, alter the plan, transform a bounded component, review evidence, and scale the pattern across an estate.
 
-The experience moves through seven chapters: estate fog, system reveal, evidence gap, human choice, bounded slice, proof, and scale.
+This is an application-like control room, not a CopilotWith information site.
 
-## Live RVAS
+## Live experience
 
-Open the hosted experience at [https://ravi0130.github.io/CopilotWith-RVAS/](https://ravi0130.github.io/CopilotWith-RVAS/).
+[Open Modernisation Mission Control](https://ravi0130.github.io/CopilotWith-RVAS/)
 
-## The seven chapters
+## The mission
 
-1. **The Fog** - 1,994 artefacts obscure a 16-interface estate.
-2. **The Reveal** - specialist agents turn files into a connected system map.
-3. **The Gap** - evidence remains distinct from inference, and I3248 needs SME context.
-4. **The Choice** - CopilotWith frames the A9_Sales options; a human chooses.
-5. **The Slice** - the decision becomes one bounded, reviewable, reversible change.
-6. **The Proof** - evidence checks finish, but only a human can approve progression.
-7. **The Scale** - one proven slice becomes a reusable programme pattern.
+1. Select the repository-grounded PolicyHub sample.
+2. Watch its application X-Ray reveal four modernisation blockers.
+3. Inspect the specialist agent fleet and evidence handoffs.
+4. Change priorities, target platform, and programme constraints.
+5. Approve a bounded pricing-service transformation.
+6. Review code, build, test, security, container, and pull-request evidence.
+7. Drag the architecture from legacy to modern.
+8. Generate modernisation waves for a 127-application illustrative estate.
+
+Three persona controls change the emphasis for executives, architects, and engineers. Story Mode is deterministic and safe for live demonstrations.
 
 ## Run locally
 
-Requirements: Node.js 20 or later and npm.
+Requires Node.js 20 or later.
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Open the URL printed by Vite, normally `http://localhost:5173/CopilotWith-RVAS/`.
+Vite normally serves the app at `http://localhost:5173/CopilotWith-RVAS/`.
 
 ```powershell
 npm run lint
@@ -38,18 +41,14 @@ npm run preview
 ## Repository map
 
 ```text
-src/App.tsx       Seven-chapter experience, interaction state, and demo model
-src/App.css       Editorial chapter layouts and responsive visual system
-src/index.css     Clawpilot theme tokens and global foundations
-docs/             Architecture, demo script, and data provenance
+src/MissionControl.tsx  Mission state, interactions, and application model
+src/MissionControl.css Responsive control-room visual system
+src/index.css          Clawpilot theme tokens and global foundations
+docs/                  Architecture, demo script, and provenance
 ```
 
-## Important demo boundary
+## Demo boundary
 
-This MVP is an illustrative replay, not a live repository scanner. Its estate facts are adapted from the CopilotWith middleware-displacement sample outputs; the SME intervention, timed reveal, delivery proof, and customer framing are narrative devices. See [docs/DATA-PROVENANCE.md](docs/DATA-PROVENANCE.md).
+The current build is a deterministic replay, not a live repository scanner. PolicyHub facts are adapted from the CopilotWith Contoso Insurance sample outputs. Generated code, validation outcomes, projected readiness, and portfolio metrics are illustrative and labelled accordingly.
 
-## Next evolution
-
-A production version can populate the same experience from repository analysis, specialist agent runs, evidence stores, approval workflows, and exported evidence packs.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the integration shape and [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) for a customer walkthrough.
+See [data provenance](docs/DATA-PROVENANCE.md), [architecture](docs/ARCHITECTURE.md), and the [customer demo script](docs/DEMO-SCRIPT.md).

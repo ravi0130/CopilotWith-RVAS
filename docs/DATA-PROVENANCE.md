@@ -2,54 +2,48 @@
 
 ## Purpose
 
-This repository is a customer demonstration accelerator. Its content combines CopilotWith operating-model concepts with an illustrative programme replay. It must not be presented as a live assessment or as findings about a real customer.
+This repository is a customer demonstration accelerator. It combines repository-grounded CopilotWith examples with clearly marked illustrative replay. It must not be presented as a live customer assessment.
 
-## Derived from CopilotWith
+## Repository-grounded content
 
-The following concepts are adapted from the CopilotWith repository and its governed agent packs:
+The PolicyHub mission is adapted from `01-modernisation/sample-output/contoso-insurance/` in the CopilotWith repository, especially the discovery report, target architecture, intelligent migration plan, pricing-engine implementation slice, and test strategy.
 
-- The Discovery, Assessment, Planning, Execution, Review, Evidence, and Governance agent spine
-- Human approval at stage gates
-- Explicit agent control boundaries
-- Evidence classification as `OBSERVED`, `INFERRED`, `ASSUMED`, and `UNKNOWN`
-- Pack names, broad scenarios, and maturity language
-- The principle that agents do not merge pull requests, push to production, approve risk, or accept policy exceptions
+Grounded facts include:
 
-Primary source areas used during authoring were the root `AGENTS.md`, the starter pack, middleware displacement pack, application modernisation pack, reverse-engineering pack, and their sample outputs.
+- .NET Framework 4.8 and an approximately 15-year-old application
+- 47 projects and approximately 380K lines of code
+- ASP.NET WebForms and MVC 5
+- Four WCF services and three Windows Services
+- SQL Server 2017 and SSRS
+- TeamCity and Octopus Deploy
+- Windows Server 2019 and IIS 10 hosting
+- Proposed modern .NET services on Azure Container Apps
+- Proposed Azure Service Bus and Blob Storage patterns
+- Bounded migration phases with explicit go/no-go gates
 
-## Repository-grounded estate facts
+The CopilotWith operating model also grounds specialist roles, explicit control boundaries, human stage gates, evidence classification, and the rule that agents do not merge pull requests, push to production, approve risk, or accept policy exceptions.
 
-The story adapts the following facts from `21-middleware-displacement/sample-output/02-documentation/00-Executive-Summary.md` in the CopilotWith repository:
+## Illustrative replay
 
-- 16 catalogued integrations
-- 1,994 source artefacts, calculated from the documented file-type breakdown
-- Nine technologies in scope
-- A9_Sales feeding eight downstream consumers directly
-- No runtime evidence for any interface
-- I3248 having no documented business purpose
-- The strategic choice to migrate A9_Sales first or last
+The following are demo devices rather than measured customer results:
 
-These facts are replayed from repository sample outputs. They are not generated from the audience's estate at runtime.
+- The topology coordinates and timed X-Ray scan
+- The exact blocker count and affected-file counts where no source report states them
+- Plan effort estimates, readiness scores, generated code diff, test output, image build, and PR number
+- Before/after operational metrics
+- The 127-application portfolio and generated waves
+- eShop and "Your application" launch-card behavior
 
-## Illustrative demo content
-
-The following are anonymised or synthetic narrative devices held in `src/App.tsx`:
-
-- `Contoso Retail`
-- The timed estate-map reveal and simplified node layout
-- The SME statement that I3248 is a month-end finance scorecard
-- The bounded slice, proof details, stage-gate record, and three-wave outcome
-
-These devices make the evidence and governance model tangible; they must not be presented as measured customer results.
+The UI labels the mission as Story Mode, calls proof an illustrative replay, and labels projected outcomes.
 
 ## Presenter rules
 
-1. Describe the mission as an “anonymised customer pattern” or “illustrative replay.”
-2. Never imply that the application has scanned the audience's estate unless a live adapter has actually done so.
-3. Keep confidence labels visible when discussing findings.
-4. Treat programme outcomes as intended capabilities, not measured customer benefits.
-5. Replace demo content only with material approved for the engagement.
+1. Say "repository-grounded sample" or "illustrative replay," never "live scan."
+2. Do not attribute projected metrics to a customer.
+3. Preserve confidence and decision classifications.
+4. Keep human approval visible and consequential.
+5. Use Connected Mode language only when a real repository adapter is active.
 
-## Moving to customer data
+## Customer-data requirements
 
-Before connecting a customer estate, define data ownership, retention, redaction, access control, regional storage, and evidence citation requirements. Each displayed finding should retain its source, collection time, producing agent, confidence classification, and review status.
+Before enabling Connected Mode, define data ownership, retention, redaction, identity, access control, regional storage, and evidence citation requirements. Every finding should retain its source, collection time, producing agent, confidence classification, and review state.

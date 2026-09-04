@@ -1,47 +1,59 @@
-# Seven-Minute Customer Story
+# 8-10 Minute Customer Mission
 
-Keep the conversation on uncertainty, decisions, and proof. This is an anonymised pattern adapted from CopilotWith sample outputs, not a live scan of the audience's estate.
+Keep the customer doing things. The product should answer their questions by changing the application, not by adding narration.
 
-## 1. The Fog - 45 seconds
+## 1. Choose the mission
 
-> Modernisation does not start with code. It starts with knowing what is true.
+Select **PolicyHub**.
 
-Begin the story. Contrast 16 integrations with 1,994 scattered artefacts and ask who owns the complete picture today.
+> This is a documented CopilotWith sample: 47 .NET Framework projects, four WCF services, Windows hosting, SQL Server, and legacy delivery tooling.
 
-## 2. The Reveal - 60 seconds
+## 2. X-Ray the application
 
-Let the census agent reveal the map. Select **A9_Sales** and call out its four platforms and eight direct consumers.
+Let the scan complete. Select **WCF Services**, then **Word Interop**.
 
-> CopilotWith makes the estate discussable before it makes it changeable.
+> Copilot turns source into a topology. CopilotWith keeps the finding, evidence, risk, target pattern, and accountable specialist connected.
 
-## 3. The Gap - 60 seconds
+Select **Activate agent fleet**.
 
-Show the evidence matrix. Source evidence exists, runtime evidence does not, and I3248 remains `UNKNOWN`. Select **Add SME knowledge**.
+## 3. Follow the agents
 
-> The agent stops at the boundary of its evidence. A domain owner changes the record to `SME-CONFIRMED`.
+Select the Integration Moderniser, Security Guardian, and Test Engineer. Use the handoff rail to distinguish `OBSERVED`, `PROPOSED`, and `DECISION`.
 
-## 4. The Choice - 75 seconds
+> This is a virtual engineering organisation, not a list of prompts. Every specialist has a mission and a boundary.
 
-Compare moving A9 first with proving the pattern on a lower-risk consumer. Choose **Prove, then migrate the hub**, then record the decision.
+Select **Watch the handoffs**.
 
-> CopilotWith recommends. It does not decide. The programme changes only when a human records the choice.
+## 4. Change the plan
 
-## 5. The Slice - 60 seconds
+Choose **Fastest migration**, switch the target between Container Apps and App Service, then return to **Lowest risk**.
 
-Show the explicit in-scope and out-of-scope lists and the pull-request rail.
+> The programme responds to customer constraints. An agent can propose this path; a person must approve its scope and architecture.
 
-> The programme does not leap from assessment to transformation. It makes one bounded, reviewable, reversible move.
+Approve the plan and begin transformation.
 
-## 6. The Proof - 75 seconds
+## 5. Transform one component
 
-Expand the contract, parallel-run, security, and rollback evidence. Select **Human approval**, then **See what scales**.
+Select **Modernise this component**. Show the WCF-to-API diff, tests, container build, and active specialist chain.
 
-> Specialist agents can report that proof is present. They cannot merge the change, accept risk, or approve their own progression.
+> The unit of progress is a bounded, reviewable change with evidence, not an autonomous rewrite.
 
-## 7. The Scale - 45 seconds
+## 6. Show the evidence
 
-Connect one proven delivery pattern to the three-wave sequence: prove, learn, transform.
+Open the evidence gate. Review the five checks and illustrative PR before approving.
 
-> CopilotWith is not AI writing code in isolation. It is a governed operating model that makes uncertainty explicit and consequential decisions human.
+> Agents cannot approve their own work, merge the pull request, accept risk, or push to production.
 
-Close by asking which estate, unresolved decision, and human gate would make the most valuable customer-specific first story.
+## 7. Use the time machine
+
+Drag from legacy to modern. Pause at the midpoint to show that transition states are intentional.
+
+> Every future-state node represents accumulated approved slices, not architecture theatre.
+
+## 8. Scale the pattern
+
+Generate modernisation waves.
+
+> GitHub Copilot gives engineers superpowers. CopilotWith gives the organisation a way to industrialise those superpowers across an application estate.
+
+Close by asking which customer application, decision gate, and proof standard should become their first connected mission.
