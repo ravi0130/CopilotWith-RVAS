@@ -9,14 +9,16 @@ import {
 import './MissionControl.css'
 
 type Persona = 'Executive' | 'Architect' | 'Developer'
-type Scene = 'brief' | 'framework' | 'packs' | 'demos' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
+type Scene = 'possibility' | 'brief' | 'framework' | 'packs' | 'demos' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
+type DemoId = 'eshop' | 'contoso' | 'petclinic'
+type DemoPhase = 'before' | 'plan' | 'after'
 type AgentId = 'archaeologist' | 'dependency' | 'planner' | 'architect' | 'integration' | 'security' | 'test' | 'deployment'
 
 const scenes: Array<{ id: Scene; label: string; verb: string }> = [
+  { id: 'possibility', label: 'Art of Possibility', verb: 'IMAGINE' },
   { id: 'brief', label: 'Mission', verb: 'ENTER' },
   { id: 'framework', label: 'Operating Model', verb: 'GOVERN' },
   { id: 'packs', label: 'Pack Atlas', verb: 'ROUTE' },
-  { id: 'demos', label: 'App Demo Lab', verb: 'DEMO' },
   { id: 'xray', label: 'Application X-Ray', verb: 'DISCOVER' },
   { id: 'fleet', label: 'Agent Team', verb: 'ORCHESTRATE' },
   { id: 'plan', label: 'Modernisation Plan', verb: 'DECIDE' },
@@ -24,7 +26,10 @@ const scenes: Array<{ id: Scene; label: string; verb: string }> = [
   { id: 'validate', label: 'Proof', verb: 'VALIDATE' },
   { id: 'time', label: 'Before / After', verb: 'COMPARE' },
   { id: 'scale', label: 'Portfolio', verb: 'SCALE' },
+  { id: 'demos', label: 'Demo Studio', verb: 'DEMO' },
 ]
+
+const programmeScenes = scenes.filter((item) => item.id !== 'possibility' && item.id !== 'demos')
 
 const agents: Record<AgentId, { name: string; role: string; activity: string; powers: string[]; tools: string; output: string; approval: string; icon: typeof Search }> = {
   archaeologist: { name: 'Documentation Agent', role: 'Reconstructs the current system before anybody changes it.', activity: 'Reading projects, configuration, entry points and business boundaries', powers: ['Repository search', 'Architecture recovery', 'Evidence citations'], tools: 'READ · SEARCH · GRAPH', output: 'HLD · LLD · ADR candidates · runbook', approval: 'None for read-only analysis', icon: Search },
@@ -127,8 +132,41 @@ const eshopMissions = [
   },
 ]
 
+const demoJourneys: Record<DemoId, {
+  name: string; eyebrow: string; source: string; truth: string; icon: typeof Code2;
+  phases: Record<DemoPhase, { title: string; summary: string; facts: string[]; outcome: string }>
+}> = {
+  eshop: {
+    name: 'eShop', eyebrow: '.NET 10 + ASPIRE', source: 'dotnet/eShop', icon: Box,
+    truth: 'A modern cloud-native reference application. This is an evolution and delivery demo, not a legacy migration.',
+    phases: {
+      before: { title: 'A modern distributed application', summary: 'Aspire composes services, dependencies and developer workflows across a current .NET solution.', facts: ['.NET 10 application', 'Aspire orchestration', 'Distributed service topology', 'Container-ready workloads'], outcome: 'SOURCE-GROUNDED CURRENT STATE' },
+      plan: { title: 'Industrialise the delivery path', summary: 'Protect contracts, inspect service boundaries, assess operational readiness and sequence deployable changes.', facts: ['Map service contracts', 'Freeze critical journeys', 'Review identity and secrets', 'Prepare repeatable cloud delivery'], outcome: 'GOVERNED DELIVERY PLAN' },
+      after: { title: 'A reviewable Azure-ready path', summary: 'The application retains its modern architecture while gaining explicit evidence, controls and deployment decisions.', facts: ['Verified service behaviour', 'Deployment assets reviewed', 'Operational controls surfaced', 'Human-approved release path'], outcome: 'DELIVERY EVIDENCE PACK' },
+    },
+  },
+  contoso: {
+    name: 'Contoso University', eyebrow: '.NET FRAMEWORK 4.8', source: 'Microsoft migration sample', icon: Braces,
+    truth: 'A source-backed legacy .NET migration journey. Proposed target decisions remain visibly separate from observed facts.',
+    phases: {
+      before: { title: 'Windows-bound university application', summary: 'The legacy application carries framework, hosting and dependency constraints that must be understood before change.', facts: ['.NET Framework 4.8', 'ASP.NET application', 'Windows hosting coupling', 'Legacy dependency surface'], outcome: 'APPLICATION X-RAY' },
+      plan: { title: 'Move in protected increments', summary: 'Baseline behaviour, resolve blockers, select the target architecture and implement one reviewable slice at a time.', facts: ['Capture characterisation tests', 'Upgrade dependency graph', 'Modernise hosting model', 'Gate architecture decisions'], outcome: 'APPROVED MIGRATION BACKLOG' },
+      after: { title: 'Modern .NET with proof', summary: 'The target state is represented by tested code, explicit residual risks and evidence for human acceptance.', facts: ['Modern .NET target', 'Portable hosting path', 'Automated parity checks', 'Reviewable pull requests'], outcome: 'MIGRATION EVIDENCE PACK' },
+    },
+  },
+  petclinic: {
+    name: 'Spring PetClinic', eyebrow: 'JAVA + POSTGRESQL + AKS', source: 'AKS migration lab', icon: Cloud,
+    truth: 'A documented Java modernisation lab covering assessment, passwordless PostgreSQL, containerisation and AKS deployment.',
+    phases: {
+      before: { title: 'Spring application with migration debt', summary: 'The application and its database access, dependencies and runtime assumptions are assessed before cloud changes begin.', facts: ['Spring Boot application', 'PostgreSQL persistence', 'Credential-based connectivity', 'Local runtime assumptions'], outcome: 'ASSESSMENT FINDINGS' },
+      plan: { title: 'Secure, containerise, then deploy', summary: 'Remediate dependencies, introduce passwordless database access, build the container and validate the AKS design.', facts: ['CVE remediation', 'Managed identity design', 'Container build and scan', 'AKS manifests and probes'], outcome: 'DEPENDENCY-ORDERED PLAN' },
+      after: { title: 'Passwordless PostgreSQL on AKS', summary: 'The resulting target uses governed identity, deployable Kubernetes assets and runtime validation evidence.', facts: ['Passwordless PostgreSQL', 'AKS workload identity', 'Health and readiness probes', 'Deployment validation'], outcome: 'AKS DELIVERY EVIDENCE' },
+    },
+  },
+}
+
 function MissionControl() {
-  const [scene, setScene] = useState<Scene>('brief')
+  const [scene, setScene] = useState<Scene>('possibility')
   const [persona, setPersona] = useState<Persona>('Architect')
   const [scan, setScan] = useState(0)
   const [focus, setFocus] = useState('all')
@@ -143,11 +181,13 @@ function MissionControl() {
   const [waves, setWaves] = useState(false)
   const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [autoDemo, setAutoDemo] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [autoDemo, setAutoDemo] = useState(false)
   const [applicationIndex, setApplicationIndex] = useState(0)
   const [packIndex, setPackIndex] = useState(0)
   const [adoptionLevel, setAdoptionLevel] = useState(2)
   const [demoMission, setDemoMission] = useState(0)
+  const [selectedDemo, setSelectedDemo] = useState<DemoId>('eshop')
+  const [demoPhase, setDemoPhase] = useState<DemoPhase>('before')
 
   const sceneIndex = scenes.findIndex((item) => item.id === scene)
 
@@ -196,8 +236,8 @@ function MissionControl() {
     if (!autoDemo || scene !== 'packs') return
     const carousel = window.setInterval(() => setPackIndex((value) => (value + 1) % packCatalog.length), 1050)
     const launch = window.setTimeout(() => {
-      setScene('demos')
-      setDemoMission(0)
+      setScene('xray')
+      setScan(1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }, 12600)
     return () => { clearInterval(carousel); clearTimeout(launch) }
@@ -244,23 +284,31 @@ function MissionControl() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const next = () => sceneIndex < scenes.length - 1 && go(scenes[sceneIndex + 1].id)
-  const previous = () => sceneIndex > 0 && go(scenes[sceneIndex - 1].id)
+  const openDemos = () => {
+    setAutoDemo(false)
+    setDemoPhase('before')
+    go('demos')
+  }
+
+  const programmeIndex = programmeScenes.findIndex((item) => item.id === scene)
+  const next = () => programmeIndex < programmeScenes.length - 1 && go(programmeScenes[programmeIndex + 1].id)
+  const previous = () => programmeIndex > 0 && go(programmeScenes[programmeIndex - 1].id)
   const autoplayAvailable = sceneIndex < scenes.findIndex((item) => item.id === 'plan')
-  const activeStatus = scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : scene === 'framework' ? 'TWO-LAYER GOVERNED OPERATING MODEL' : scene === 'packs' ? packCatalog[packIndex].name.toUpperCase() : scene === 'demos' ? `ESHOPONWEB · ${eshopMissions[demoMission].verb}` : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'
+  const activeStatus = scene === 'possibility' ? 'GITHUB COPILOT · ENGINEERING POSSIBILITY' : scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : scene === 'framework' ? 'TWO-LAYER GOVERNED OPERATING MODEL' : scene === 'packs' ? packCatalog[packIndex].name.toUpperCase() : scene === 'demos' ? `${demoJourneys[selectedDemo].name.toUpperCase()} · ${demoPhase.toUpperCase()}` : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'
 
   return <div className="mc-shell">
     <header className="mc-topbar">
-      <button className="mc-brand" onClick={() => go('brief')} aria-label="Return to mission start">
+      <button className="mc-brand" onClick={() => go('possibility')} aria-label="Return to experience start">
         <span className="brand-mark"><Radar /></span>
         <span><b>COPILOTWITH</b><small>MODERNISATION MISSION CONTROL</small></span>
       </button>
       <nav className="mc-nav" aria-label="Mission journey">
-        {scenes.map((item, index) => <button key={item.id} className={scene === item.id ? 'active' : ''} onClick={() => go(item.id)}><span>{String(index + 1).padStart(2, '0')}</span>{item.verb}</button>)}
+        {programmeScenes.map((item, index) => <button key={item.id} className={scene === item.id ? 'active' : ''} onClick={() => go(item.id)}><span>{String(index + 1).padStart(2, '0')}</span>{item.verb}</button>)}
       </nav>
+      <button className={`demos-button ${scene === 'demos' ? 'active' : ''}`} onClick={openDemos}><Play /> DEMOS</button>
       <button className="evidence-button" onClick={() => setEvidenceOpen(true)}><ShieldCheck /> SHOW ME THE EVIDENCE</button>
       <button className="menu-button" onClick={() => setMenuOpen((value) => !value)} aria-label="Open mission navigation" aria-expanded={menuOpen}><Menu /></button>
-      {menuOpen && <nav className="mobile-nav">{scenes.map((item, index) => <button key={item.id} onClick={() => go(item.id)}>{String(index + 1).padStart(2, '0')} · {item.label}</button>)}</nav>}
+      {menuOpen && <nav className="mobile-nav"><button onClick={() => go('possibility')}>GHCP · Art of Possibility</button><button onClick={openDemos}>DEMOS · Demo Studio</button>{programmeScenes.map((item, index) => <button key={item.id} onClick={() => go(item.id)}>{String(index + 1).padStart(2, '0')} · {item.label}</button>)}</nav>}
     </header>
 
     <div className="mc-statusbar">
@@ -271,27 +319,78 @@ function MissionControl() {
     </div>
 
     <main className="mc-main">
+      {scene === 'possibility' && <PossibilityScene onProgramme={() => go('brief')} onDemos={openDemos} />}
       {scene === 'brief' && <BriefScene selected={applicationIndex} onSelect={setApplicationIndex} onStart={() => { setAutoDemo(true); go('framework') }} />}
       {scene === 'framework' && <FrameworkScene onNext={next} />}
       {scene === 'packs' && <PackAtlasScene selected={packIndex} onSelect={setPackIndex} onNext={next} />}
-      {scene === 'demos' && <DemoLabScene selected={demoMission} onSelect={setDemoMission} onNext={next} />}
+      {scene === 'demos' && <DemoStudio selectedDemo={selectedDemo} phase={demoPhase} onDemo={setSelectedDemo} onPhase={setDemoPhase} legacyMission={demoMission} onLegacyMission={setDemoMission} onNext={() => go('brief')} />}
       {scene === 'xray' && <XrayScene scan={scan} focus={focus} onFocus={setFocus} onNext={next} />}
       {scene === 'fleet' && <FleetScene selected={agent} onSelect={setAgent} handoffStep={handoffStep} onReplay={() => setHandoffStep(0)} onNext={next} />}
       {scene === 'plan' && <PlanScene priority={priority} constraint={constraint} approved={approved} onPriority={(value) => { setPriority(value); setApproved(false) }} onConstraint={(value) => { setConstraint(value); setApproved(false) }} onApprove={() => setApproved(true)} onNext={next} />}
       {scene === 'transform' && <TransformScene transformed={transformed} onTransform={() => setTransformed(true)} onNext={next} />}
       {scene === 'validate' && <ValidateScene validated={validated} onValidate={() => setValidated(true)} onNext={next} />}
       {scene === 'time' && <TimeScene value={modernity} onChange={setModernity} onNext={next} />}
-      {scene === 'scale' && <ScaleScene waves={waves} persona={persona} adoptionLevel={adoptionLevel} onAdoptionLevel={setAdoptionLevel} onGenerate={() => setWaves(true)} onRestart={() => go('brief')} />}
+      {scene === 'scale' && <ScaleScene waves={waves} persona={persona} adoptionLevel={adoptionLevel} onAdoptionLevel={setAdoptionLevel} onGenerate={() => setWaves(true)} onRestart={() => go('possibility')} />}
     </main>
 
-    {scene !== 'brief' && <footer className="mission-footer">
+    {programmeIndex > 0 && <footer className="mission-footer">
       <button onClick={previous}><ChevronLeft /> PREVIOUS</button>
-      <div><span>{scenes[sceneIndex].verb}</span><strong>{scenes[sceneIndex].label}</strong><i style={{ width: `${((sceneIndex + 1) / scenes.length) * 100}%` }} /></div>
-      <button onClick={next} disabled={sceneIndex === scenes.length - 1} aria-label={sceneIndex === scenes.length - 1 ? 'Final mission scene' : 'Next mission scene'}>NEXT <ChevronRight /></button>
+      <div><span>{programmeScenes[programmeIndex].verb}</span><strong>{programmeScenes[programmeIndex].label}</strong><i style={{ width: `${((programmeIndex + 1) / programmeScenes.length) * 100}%` }} /></div>
+      <button onClick={next} disabled={programmeIndex === programmeScenes.length - 1} aria-label={programmeIndex === programmeScenes.length - 1 ? 'Final mission scene' : 'Next mission scene'}>NEXT <ChevronRight /></button>
     </footer>}
 
     {evidenceOpen && <EvidenceDrawer onClose={() => setEvidenceOpen(false)} transformed={transformed} validated={validated} />}
   </div>
+}
+
+function PossibilityScene({ onProgramme, onDemos }: { onProgramme: () => void; onDemos: () => void }) {
+  const capabilities = [
+    ['UNDERSTAND', 'Explain unfamiliar systems and trace dependencies', Search],
+    ['PLAN', 'Turn intent and evidence into reviewable work', Radar],
+    ['CODE', 'Implement bounded changes in the developer flow', Code2],
+    ['TEST', 'Create safety nets and validate behaviour', TestTube2],
+    ['SECURE', 'Surface vulnerable dependencies and risky patterns', ShieldCheck],
+    ['DELIVER', 'Prepare infrastructure and deployment assets', Rocket],
+    ['OPERATE', 'Investigate runtime signals and incidents', Activity],
+  ] as const
+  return <section className="possibility-scene scene-enter">
+    <div className="possibility-copy">
+      <span className="kicker"><i /> GITHUB COPILOT · THE ART OF POSSIBILITY</span>
+      <h1>From a question<br />to working software.</h1>
+      <p>GitHub Copilot brings reasoning, code understanding and engineering action into the tools where teams already work. It can help across the lifecycle, with people retaining direction, judgment and accountability.</p>
+      <div className="possibility-actions"><button className="hero-action" onClick={onProgramme}><Radar /> INTRODUCE COPILOTWITH <ArrowRight /></button><button className="secondary-action" onClick={onDemos}><Play /> EXPLORE DEMOS</button></div>
+    </div>
+    <div className="capability-theatre" aria-label="GitHub Copilot engineering capabilities">
+      <div className="copilot-core"><Sparkles /><small>GITHUB COPILOT</small><strong>ENGINEERING<br />INTELLIGENCE</strong><span>HUMAN DIRECTED</span></div>
+      {capabilities.map(([verb, detail, Icon], index) => <article key={verb} className={`capability-node capability-${index}`}><Icon /><span><b>{verb}</b><small>{detail}</small></span></article>)}
+    </div>
+    <div className="possibility-bridge"><div><Bot /><span><small>THE POSSIBILITY</small>Copilot accelerates an engineer</span></div><ArrowRight /><div><Radar /><span><small>THE PROGRAMME</small>CopilotWith coordinates governed modernisation</span></div><ArrowRight /><div><UserCheck /><span><small>THE ACCOUNTABILITY</small>People approve direction, risk and outcomes</span></div></div>
+  </section>
+}
+
+function DemoStudio({ selectedDemo, phase, onDemo, onPhase, legacyMission, onLegacyMission, onNext }: {
+  selectedDemo: DemoId; phase: DemoPhase; onDemo: (value: DemoId) => void; onPhase: (value: DemoPhase) => void;
+  legacyMission: number; onLegacyMission: (value: number) => void; onNext: () => void
+}) {
+  const journey = demoJourneys[selectedDemo]
+  const active = journey.phases[phase]
+  const JourneyIcon = journey.icon
+  const phases: DemoPhase[] = ['before', 'plan', 'after']
+  return <section className="demo-studio scene-enter">
+    <header className="studio-heading"><div><span>DEMO STUDIO · SOURCE-GROUNDED JOURNEYS</span><h1>Three applications. Three honest modernisation stories.</h1><p>Select a demo, then move through its current state, governed plan and evidenced target. Each journey preserves the boundaries of its source material.</p></div><b><ShieldCheck /> FACTS AND PROPOSALS STAY SEPARATE</b></header>
+    <nav className="demo-selector" aria-label="Application demos">
+      {(Object.keys(demoJourneys) as DemoId[]).map((id, index) => { const item = demoJourneys[id]; const Icon = item.icon; return <button key={id} className={selectedDemo === id ? 'active' : ''} onClick={() => { onDemo(id); onPhase('before') }}><span>0{index + 1}</span><Icon /><small>{item.eyebrow}</small><strong>{item.name}</strong><em>{item.source}</em></button> })}
+    </nav>
+    <div className="journey-board">
+      <aside className="journey-identity"><span><JourneyIcon /></span><small>{journey.eyebrow}</small><h2>{journey.name}</h2><p>{journey.truth}</p><dl><dt>SOURCE</dt><dd>{journey.source}</dd><dt>REPLAY BOUNDARY</dt><dd>Deterministic UI based on documented source facts</dd></dl></aside>
+      <div className="phase-console">
+        <nav className="phase-switch" aria-label="Demo journey phase">{phases.map((item, index) => <button key={item} className={phase === item ? 'active' : ''} onClick={() => onPhase(item)}><span>0{index + 1}</span>{item === 'plan' ? 'MODERNISATION PLAN' : item.toUpperCase()}</button>)}</nav>
+        <article className={`phase-panel phase-${phase}`}><header><span>{phase === 'before' ? 'OBSERVED CURRENT STATE' : phase === 'plan' ? 'PROPOSED AND HUMAN-GATED' : 'TARGET OUTCOME'}</span><b>{active.outcome}</b></header><JourneyIcon /><h2>{active.title}</h2><p>{active.summary}</p><div>{active.facts.map((fact, index) => <span key={fact}><b>0{index + 1}</b><Check />{fact}</span>)}</div><footer><UserCheck /><span><small>ACCOUNTABILITY CHECK</small>{phase === 'before' ? 'Validate findings with maintainers and runtime evidence.' : phase === 'plan' ? 'Approve scope, architecture, sequencing and accepted risk.' : 'Accept only after tests and deployment evidence pass.'}</span></footer></article>
+      </div>
+    </div>
+    {selectedDemo === 'eshop' && <div className="deep-replay"><header><span>DEEP SOURCE REPLAY</span><b>The existing eShopOnWeb mission remains available as an additional reference implementation.</b></header><DemoLabScene selected={legacyMission} onSelect={onLegacyMission} onNext={onNext} /></div>}
+    {selectedDemo !== 'eshop' && <div className="studio-next"><span><b>NEXT STORY STEP</b>{phase === 'before' ? 'Inspect the dependency-ordered modernisation plan.' : phase === 'plan' ? 'Review the evidenced target outcome.' : 'Continue into the full CopilotWith programme.'}</span><button className="main-action" onClick={() => phase === 'before' ? onPhase('plan') : phase === 'plan' ? onPhase('after') : onNext()}>{phase === 'after' ? 'ENTER MISSION CONTROL' : 'CONTINUE JOURNEY'} <ArrowRight /></button></div>}
+  </section>
 }
 
 function BriefScene({ selected, onSelect, onStart }: { selected: number; onSelect: (value: number) => void; onStart: () => void }) {

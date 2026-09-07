@@ -42,6 +42,16 @@ The Understand, Protect, and Deliver event timing, agent activity, and named out
 
 The nearby `sample-output/eshop-catalogue` material describes an illustrative multi-variant catalogue estate. Its WCF and WebForms risks must never be attributed to the actual eShopOnWeb source.
 
+## Demo studio grounding
+
+The three studio journeys are independent and must not be merged into one application history:
+
+- **eShop** is grounded in <https://github.com/dotnet/eShop>. It is a modern .NET 10 and Aspire reference application. Its studio journey demonstrates delivery evolution, not legacy remediation.
+- **Contoso University** is grounded in <https://github.com/Azure-Samples/dotnet-migration-copilot-samples>. It represents a legacy .NET Framework 4.8 migration scenario. Proposed modern .NET outcomes are not measured deployment results.
+- **Spring PetClinic** is grounded in the supplied AKS migration lab. The lab covers assessment, dependency remediation, passwordless PostgreSQL, containerisation, and AKS deployment. The displayed phase summaries are a deterministic synthesis, not a live lab execution.
+
+The studio's Before facts are source-grounded summaries. Modernisation Plan content is proposed and human-gated. After content describes target outcomes that require test and deployment evidence before acceptance.
+
 ## Presenter rules
 
 1. Say "illustrative replay," never "live scan" or "measured customer result."

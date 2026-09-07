@@ -2,16 +2,18 @@
 
 ## Current implementation
 
-The accelerator is a client-side React application with a deterministic mission state machine in `src/MissionControl.tsx`. It models application-domain rotation, the two-layer framework, pack routing, an eShopOnWeb application demo lab, autonomous scene progression, scan progress, specialist selection, agent handoffs, plan constraints, human approvals, transformation output, validation evidence, architecture progression, portfolio waves, and adoption level.
+The accelerator is a client-side React application with a deterministic state machine in `src/MissionControl.tsx`. It has three top-level experiences: a GitHub Copilot possibility opening, the preserved CopilotWith programme journey, and an independently addressable demo studio. The studio owns selected-application and Before / Plan / After state; the programme continues to own pack routing, scan progress, specialist handoffs, approvals, transformation, proof, portfolio waves, and adoption level.
 
-Two applications serve different purposes. Microsoft eShopOnWeb grounds the Demo Lab in an observed ASP.NET Core 8 project and deployment structure. Contoso University is a controlled illustrative legacy payload used to demonstrate blocker discovery, planning, transformation, and proof without implying measured results.
+Four named application contexts serve different purposes. `dotnet/eShop` demonstrates modern .NET and Aspire delivery evolution. The Contoso University migration sample demonstrates legacy .NET Framework modernisation. The PetClinic lab demonstrates Java, passwordless PostgreSQL, containerisation, and AKS. Microsoft eShopOnWeb remains the source-grounded deep replay embedded under the eShop journey. These contexts are not blended into one migration claim.
 
 ```mermaid
 flowchart LR
-    M[Application launch bay] --> G[Two-layer operating model]
+    H[GHCP art of possibility] --> M[CopilotWith launch bay]
+    H --> D[Independent demo studio]
+    D --> B[Before / Plan / After]
+    M --> G[Two-layer operating model]
     G --> R[Specialist pack atlas]
-    R --> D[eShopOnWeb Demo Lab]
-    D --> X[Illustrative legacy Application X-Ray]
+    R --> X[Illustrative legacy Application X-Ray]
     X --> A[Agent fleet and handoffs]
     A --> P[Autoplay stops at human decision]
     P --> T[Bounded transformation]
@@ -20,7 +22,7 @@ flowchart LR
     F --> W[Portfolio waves and adoption ladder]
 ```
 
-The Demo Lab maintains the selected Understand, Protect, or Deliver mission in React state. Autoplay rotates those missions before progressing to the X-Ray; presenter controls can pause the sequence and select any mission directly.
+The Demo Studio is deliberately excluded from programme autoplay. The persistent Demos control opens it from any scene and disables autoplay. The embedded eShopOnWeb replay retains its selected Understand, Protect, or Deliver mission state.
 
 The current implementation has no backend, authentication, telemetry, or customer repository connection. Its guided replay is deterministic, and the eShopOnWeb storefront is stored locally, so customer demonstrations do not depend on network or model variance.
 
