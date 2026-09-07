@@ -2,13 +2,13 @@
 
 ## Current implementation
 
-The accelerator is a client-side React application with a deterministic mission state machine in `src/MissionControl.tsx`. It models persona, scan progress, graph focus, specialist selection, agent handoffs, plan constraints, human approvals, transformation output, validation evidence, architecture progression, and portfolio waves.
+The accelerator is a client-side React application with a deterministic mission state machine in `src/MissionControl.tsx`. It models application-domain rotation, autonomous scene progression, scan progress, graph focus, specialist selection, agent handoffs, plan constraints, human approvals, transformation output, validation evidence, architecture progression, and portfolio waves.
 
 ```mermaid
 flowchart LR
-    M[Enter mission] --> X[Application X-Ray]
+    M[Application launch bay] --> X[Streaming Application X-Ray]
     X --> A[Agent fleet and handoffs]
-    A --> P[Plan and human decision]
+    A --> P[Autoplay stops at human decision]
     P --> T[Bounded transformation]
     T --> E[Validation and evidence]
     E --> F[Modernisation time machine]

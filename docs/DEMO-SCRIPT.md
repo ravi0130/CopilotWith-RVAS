@@ -2,27 +2,25 @@
 
 Keep the customer doing things. The product should answer their questions by changing the application, not by adding narration.
 
-## 1. Choose the mission
+## 1. Let the mission begin
 
-Select **Start a modernisation mission**.
+Do not touch the controls. The launch bay cycles through eight modernisation domains and routes each one to its specialist pack. After a short interval it launches the .NET replay automatically.
 
 > Contoso University is an illustrative legacy application. GitHub Copilot supplies the engineering engine; CopilotWith turns that capability into a controlled mission.
 
-## 2. X-Ray the application
+## 2. Watch the X-Ray
 
-Let the scan complete. Select **MSMQ**, then ask **What prevents containerisation?** and **Show messaging blockers**.
+The topology expands while the side rail streams timestamped, classified evidence. The mission advances automatically when the scan is complete.
 
 > Copilot turns source into a topology. CopilotWith keeps the finding, evidence, risk, target pattern, and accountable specialist connected.
 
-Select **Meet the agent team**.
-
 ## 3. Follow the agents
 
-Select the Integration Moderniser, Security Guardian, and Test Engineer. Let the handoff theatre distinguish `OBSERVED`, `PROPOSED`, `READY`, and `DECISION`.
+Let the active specialist change as the handoff theatre distinguishes `OBSERVED`, `PROPOSED`, `READY`, and `DECISION`. Point out powers, tools, produced artefacts, and the human boundary. The lower rail shows the wider 127-definition library.
 
 > This is a virtual engineering organisation, not a list of prompts. Every specialist has a mission and a boundary.
 
-Replay the handoffs once if the audience wants to follow the chain again.
+Autoplay stops at the next scene. This pause is intentional: architecture, scope, and risk need a person.
 
 ## 4. Change the plan
 

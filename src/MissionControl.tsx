@@ -3,7 +3,7 @@ import {
   Activity, ArrowRight, Bot, Box, Braces, Check, ChevronLeft, ChevronRight,
   CircleAlert, Cloud, Code2, Database, FileCode2, FileText, GitBranch,
   GitPullRequest, Layers3, LockKeyhole, Menu, MessageSquareText, Network,
-  PackageCheck, Play, Radar, RefreshCw, Rocket, Search, Server, ShieldCheck,
+  PackageCheck, Pause, Play, Radar, RefreshCw, Rocket, Search, Server, ShieldCheck,
   Sparkles, TestTube2, UserCheck, Users, X, Zap,
 } from 'lucide-react'
 import './MissionControl.css'
@@ -23,16 +23,42 @@ const scenes: Array<{ id: Scene; label: string; verb: string }> = [
   { id: 'scale', label: 'Portfolio', verb: 'SCALE' },
 ]
 
-const agents: Record<AgentId, { name: string; role: string; activity: string; output: string; approval: string; icon: typeof Search }> = {
-  archaeologist: { name: 'Application Archaeologist', role: 'Understands the application before anybody changes it.', activity: 'Mapping projects, frameworks, configuration and business boundaries', output: 'Application map · technology inventory · unknowns', approval: 'None for read-only analysis', icon: Search },
-  dependency: { name: 'Dependency Specialist', role: 'Finds compatibility, coupling and migration blockers.', activity: 'Tracing MSMQ producers and consumers across the solution', output: 'Dependency graph · blocker register · affected code', approval: 'Required before dependency replacement', icon: Layers3 },
-  planner: { name: 'Modernisation Strategist', role: 'Turns findings into a sequenced, reversible backlog.', activity: 'Recomputing the lowest-risk path around customer constraints', output: 'Modernisation plan · waves · acceptance criteria', approval: 'Scope and sequencing require approval', icon: Radar },
-  architect: { name: 'Cloud Architect', role: 'Maps legacy patterns to modern Azure services.', activity: 'Comparing Container Apps, App Service and hybrid targets', output: 'Target architecture · ADRs · transition states', approval: 'Architecture choice requires approval', icon: Cloud },
-  integration: { name: 'Integration Moderniser', role: 'Replaces queues, files, APIs and legacy interfaces.', activity: 'Preparing the bounded MSMQ to Service Bus refactor', output: 'Code change · configuration · compatibility tests', approval: 'Breaking contracts require approval', icon: Network },
-  security: { name: 'Security Guardian', role: 'Checks packages, secrets, identity and network exposure.', activity: 'Evaluating CVEs and deployment security controls', output: 'Security findings · exceptions · gate evidence', approval: 'Risk acceptance remains human', icon: ShieldCheck },
-  test: { name: 'Test & Validation Engineer', role: 'Preserves behaviour and proves each change.', activity: 'Freezing the baseline and generating migration tests', output: 'Tests · build results · behavioural comparison', approval: 'Test exceptions require approval', icon: TestTube2 },
-  deployment: { name: 'Deployment Engineer', role: 'Creates container, infrastructure and release assets.', activity: 'Preparing Container Apps and GitHub Actions assets', output: 'Dockerfile · workflow · deployment plan', approval: 'Production deployment requires approval', icon: Rocket },
+const agents: Record<AgentId, { name: string; role: string; activity: string; powers: string[]; tools: string; output: string; approval: string; icon: typeof Search }> = {
+  archaeologist: { name: 'Documentation Agent', role: 'Reconstructs the current system before anybody changes it.', activity: 'Reading projects, configuration, entry points and business boundaries', powers: ['Repository search', 'Architecture recovery', 'Evidence citations'], tools: 'READ · SEARCH · GRAPH', output: 'HLD · LLD · ADR candidates · runbook', approval: 'None for read-only analysis', icon: Search },
+  dependency: { name: 'Leiden Decomposition Agent', role: 'Finds communities, bridge nodes and migration coupling.', activity: 'Tracing MSMQ producers and consumers across the solution graph', powers: ['Dependency graph', 'Community detection', 'Bridge-node risk'], tools: 'SEARCH · EXECUTE · GRAPH', output: 'Candidate communities · blocker register · affected code', approval: 'Boundaries require human validation', icon: Layers3 },
+  planner: { name: 'Modernisation Agent', role: 'Selects the safest strategy and routes to the correct planner.', activity: 'Comparing refactor, modular monolith and microservices paths', powers: ['Strategy selection', 'Constraint reasoning', 'Agent routing'], tools: 'READ · SEARCH · PLAN', output: 'Strategy decision · planning-agent handoff', approval: 'Strategy and sequencing require approval', icon: Radar },
+  architect: { name: 'Microservices Plan Agent', role: 'Designs service boundaries, contracts and phased extraction.', activity: 'Mapping the messaging boundary to a reversible Azure target', powers: ['Target design', 'Contract design', 'Transition states'], tools: 'READ · SEARCH · DIAGRAM', output: 'Service plan · ADR drafts · extraction sequence', approval: 'Architecture choice requires approval', icon: Cloud },
+  integration: { name: 'Implementation Agent', role: 'Implements one approved, reviewable modernisation slice.', activity: 'Replacing the bounded MSMQ publisher with Azure Service Bus', powers: ['Edit source', 'Fix build', 'Create configuration'], tools: 'READ · EDIT · EXECUTE · TODO', output: 'Code diff · configuration · migration notes', approval: 'Cannot re-scope or merge its own work', icon: Network },
+  security: { name: 'Security Review Agent', role: 'Checks packages, secrets, identity and network exposure.', activity: 'Evaluating CVEs and deployment security controls', powers: ['CVE scanning', 'Secret detection', 'Control verification'], tools: 'SEARCH · EXECUTE · GHAS', output: 'Security findings · remediation · gate evidence', approval: 'Risk acceptance remains human', icon: ShieldCheck },
+  test: { name: 'Testing Agent', role: 'Freezes behaviour and proves each approved change.', activity: 'Generating characterisation and compatibility tests', powers: ['Test synthesis', 'Baseline capture', 'Parity checking'], tools: 'READ · EDIT · EXECUTE', output: 'Tests · build results · behavioural comparison', approval: 'Test exceptions require approval', icon: TestTube2 },
+  deployment: { name: 'UI & Deployment Agents', role: 'Modernise presentation and prepare governed delivery assets.', activity: 'Preparing accessible UI, container and GitHub Actions assets', powers: ['UI migration', 'Containerisation', 'Pipeline generation'], tools: 'EDIT · EXECUTE · BROWSER', output: 'UI · Dockerfile · workflow · deployment plan', approval: 'Production deployment requires approval', icon: Rocket },
 }
+
+const applicationTypes = [
+  { name: '.NET Framework', example: 'WebForms · WCF · Windows Services', pack: 'MODERNISATION', icon: Braces },
+  { name: 'COBOL Mainframe', example: 'CICS · JCL · VSAM · DB2', pack: 'COBOL', icon: Server },
+  { name: 'Progress OpenEdge', example: 'ABL · AppServer · procedures', pack: 'PROGRESS', icon: Database },
+  { name: 'Uniface', example: 'Forms · triggers · operations', pack: 'UNIFACE', icon: FileCode2 },
+  { name: 'Liferay Portal', example: 'OSGi · portlets · themes', pack: 'LIFERAY', icon: Layers3 },
+  { name: 'Integration Estate', example: 'ACE · IIB · MQ · APIs', pack: 'MIDDLEWARE', icon: Network },
+  { name: 'HDInsight', example: 'Spark · Hive · HBase · Oozie', pack: 'DATABRICKS', icon: Cloud },
+  { name: 'Azure DevOps', example: 'YAML · Classic pipelines · releases', pack: 'GITHUB ACTIONS', icon: GitBranch },
+]
+
+const xrayEvents = [
+  ['00:00:01', 'Repository indexed', 'SOURCE'],
+  ['00:00:02', '147 source files analysed', 'OBSERVED'],
+  ['00:00:03', '.NET Framework dependency detected', 'OBSERVED'],
+  ['00:00:04', 'Windows-specific messaging detected', 'BLOCKER'],
+  ['00:00:05', 'Local persistence pattern detected', 'BLOCKER'],
+  ['00:00:06', '4 modernisation blockers identified', 'EVIDENCE'],
+]
+
+const packInventory = [
+  ['APP MODERNISATION', '11 agents'], ['COBOL', '9 agents'], ['PROGRESS', '9 agents'],
+  ['UNIFACE', '9 agents'], ['MIDDLEWARE', '12 agents'], ['REVERSE ENGINEERING', '19 agents'],
+  ['DATA & ANALYTICS', '30+ agents'], ['DELIVERY & CHANGE', '10+ agents'],
+]
 
 const blockers = [
   { id: 'runtime', label: '.NET Framework 4.8', detail: 'Windows-only runtime', target: 'Modern .NET', risk: 'HIGH', icon: Braces, x: 50, y: 15 },
@@ -69,6 +95,8 @@ function MissionControl() {
   const [waves, setWaves] = useState(false)
   const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [autoDemo, setAutoDemo] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [applicationIndex, setApplicationIndex] = useState(0)
 
   const sceneIndex = scenes.findIndex((item) => item.id === scene)
 
@@ -85,9 +113,45 @@ function MissionControl() {
 
   useEffect(() => {
     if (scene !== 'fleet' || handoffStep >= handoffs.length) return
-    const timer = window.setTimeout(() => setHandoffStep((value) => value + 1), 650)
+    const sequence: AgentId[] = ['archaeologist', 'dependency', 'architect', 'planner', 'integration', 'test']
+    const timer = window.setTimeout(() => {
+      setHandoffStep((value) => value + 1)
+      setAgent(sequence[Math.min(handoffStep, sequence.length - 1)])
+    }, 650)
     return () => clearTimeout(timer)
   }, [scene, handoffStep])
+
+  useEffect(() => {
+    if (!autoDemo || scene !== 'brief') return
+    const carousel = window.setInterval(() => setApplicationIndex((value) => (value + 1) % applicationTypes.length), 1200)
+    const launch = window.setTimeout(() => {
+      setScene('xray')
+      setScan(1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 7600)
+    return () => { clearInterval(carousel); clearTimeout(launch) }
+  }, [autoDemo, scene])
+
+  useEffect(() => {
+    if (!autoDemo || scene !== 'xray' || scan < 100) return
+    const timer = window.setTimeout(() => {
+      setScene('fleet')
+      setHandoffStep(0)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 3200)
+    return () => clearTimeout(timer)
+  }, [autoDemo, scene, scan])
+
+  useEffect(() => {
+    if (!autoDemo || scene !== 'fleet') return
+    if (handoffStep < handoffs.length) return
+    const timer = window.setTimeout(() => {
+      setScene('plan')
+      setAutoDemo(false)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 2600)
+    return () => clearTimeout(timer)
+  }, [autoDemo, scene, handoffStep])
 
   const go = (next: Scene) => {
     setScene(next)
@@ -115,13 +179,14 @@ function MissionControl() {
     </header>
 
     <div className="mc-statusbar">
-      <span><i /> GUIDED DEMO</span>
-      <span className="app-status"><b>ACTIVE APPLICATION</b> CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8</span>
+      <span><i /> {autoDemo ? 'AUTONOMOUS DEMO RUNNING' : 'PRESENTER CONTROL'}</span>
+      <span className="app-status"><b>ACTIVE APPLICATION</b> {scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'}</span>
+      <button className="autoplay-toggle" onClick={() => setAutoDemo((value) => !value)}>{autoDemo ? <Pause /> : <Play />} {autoDemo ? 'PAUSE' : 'AUTOPLAY'}</button>
       <div className="persona-switch"><small>VIEW AS</small>{(['Executive', 'Architect', 'Developer'] as Persona[]).map((item) => <button key={item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>{item}</button>)}</div>
     </div>
 
     <main className="mc-main">
-      {scene === 'brief' && <BriefScene onStart={() => go('xray')} />}
+      {scene === 'brief' && <BriefScene selected={applicationIndex} onSelect={setApplicationIndex} onStart={() => { setAutoDemo(true); go('xray') }} />}
       {scene === 'xray' && <XrayScene scan={scan} focus={focus} onFocus={setFocus} onNext={next} />}
       {scene === 'fleet' && <FleetScene selected={agent} onSelect={setAgent} handoffStep={handoffStep} onReplay={() => setHandoffStep(0)} onNext={next} />}
       {scene === 'plan' && <PlanScene priority={priority} constraint={constraint} approved={approved} onPriority={(value) => { setPriority(value); setApproved(false) }} onConstraint={(value) => { setConstraint(value); setApproved(false) }} onApprove={() => setApproved(true)} onNext={next} />}
@@ -141,13 +206,15 @@ function MissionControl() {
   </div>
 }
 
-function BriefScene({ onStart }: { onStart: () => void }) {
+function BriefScene({ selected, onSelect, onStart }: { selected: number; onSelect: (value: number) => void; onStart: () => void }) {
+  const active = applicationTypes[selected]
+  const ActiveIcon = active.icon
   return <section className="brief-scene scene-enter">
     <div className="brief-grid">
       <div className="brief-copy">
         <span className="kicker"><i /> GHCP APP MODERNISATION · GUIDED EXPERIENCE</span>
-        <h1>What if your application could tell you how it wants to be modernised?</h1>
-        <p>Hand CopilotWith a legacy application. Watch GitHub Copilot assess it, plan the work, change the code, fix the build, create tests, containerise it and prepare it for Azure, while specialist agents and human gates keep the programme controlled.</p>
+        <h1>One mission control. Every kind of legacy.</h1>
+        <p>Choose an application estate. Watch GitHub Copilot inspect the real engineering surface while CopilotWith activates the specialist agents, evidence chain and human gates needed for that technology.</p>
         <button className="hero-action" onClick={onStart}><Play fill="currentColor" /> START A MODERNISATION MISSION <ArrowRight /></button>
         <div className="journey-line"><span>DISCOVER</span><i /><span>DESIGN</span><i /><span>SECURE</span><i /><span>MODERNISE</span><i /><span>VALIDATE</span><i /><span>DEPLOY</span></div>
       </div>
@@ -155,15 +222,16 @@ function BriefScene({ onStart }: { onStart: () => void }) {
         <div className="stage-rings"><span /><span /><span /></div>
         <div className="application-orb">
           <span className="orb-status">MODERNISATION READY</span>
-          <Server />
-          <small>LEGACY APPLICATION</small>
-          <h2>Contoso University</h2>
-          <p>.NET Framework 4.8 · Windows · SQL · MSMQ</p>
-          <div><b>9</b><span>projects</span><b>23</b><span>dependencies</span><b>4</b><span>blockers</span></div>
+          <ActiveIcon />
+          <small>{active.pack} PACK</small>
+          <h2>{active.name}</h2>
+          <p>{active.example}</p>
+          <div><b>LIVE</b><span>agent route</span><b>127</b><span>agent definitions</span><b>12+</b><span>specialist packs</span></div>
         </div>
         <div className="satellite s1">MSMQ</div><div className="satellite s2">SQL</div><div className="satellite s3">IIS</div><div className="satellite s4">FILES</div>
       </div>
     </div>
+    <div className="application-launch-bay"><header><span>WHAT CAN COPILOTWITH MODERNISE?</span><b>AUTOMATICALLY ROUTING TO THE RIGHT AGENT PACK</b></header><div>{applicationTypes.map((item, index) => { const Icon = item.icon; return <button key={item.name} className={selected === index ? 'active' : ''} onClick={() => onSelect(index)}><Icon /><span><strong>{item.name}</strong><small>{item.example}</small></span><em>{item.pack}</em></button> })}</div></div>
     <div className="promise-strip"><div><Bot /><span><small>GITHUB COPILOT</small>Analysis · planning · transformation · testing</span></div><ArrowRight /><div><Radar /><span><small>COPILOTWITH</small>Specialists · governance · evidence · programme scale</span></div><ArrowRight /><div><Cloud /><span><small>AZURE</small>Target architecture · deployment · operations</span></div></div>
   </section>
 }
@@ -184,6 +252,7 @@ function XrayScene({ scan, focus, onFocus, onNext }: { scan: number; focus: stri
         <div className="copilot-prompt"><MessageSquareText /><div><small>ASK COPILOTWITH ABOUT THIS APPLICATION</small><strong>{focus === 'containers' ? 'Four components prevent a direct move to containers.' : `Explain ${selected.label} and show the affected modernisation path.`}</strong></div><button onClick={() => onFocus('containers')}>What prevents containerisation?</button><button onClick={() => onFocus('queue')}>Show messaging blockers</button></div>
       </div>
       <aside className="finding-panel" aria-live="polite" aria-label="Selected blocker details">
+        <div className="analysis-stream"><header><Activity /><span><small>LIVE COPILOT ANALYSIS</small>EVIDENCE STREAM</span></header>{xrayEvents.map(([time, message, type], index) => <div key={message} className={scan >= 12 + index * 15 ? 'visible' : ''}><time>{time}</time><span>{message}</span><b>{type}</b></div>)}</div>
         <span className="danger-label"><CircleAlert /> MODERNISATION BLOCKER</span>
         <SelectedIcon />
         <small>CURRENT DEPENDENCY</small><h2>{selected.label}</h2>
@@ -204,9 +273,10 @@ function FleetScene({ selected, onSelect, handoffStep, onReplay, onNext }: { sel
         <div className="orchestrator-core"><Radar /><strong>COPILOTWITH</strong><span>ORCHESTRATOR</span><i /></div>
         {(Object.entries(agents) as Array<[AgentId, typeof agents[AgentId]]>).map(([id, item], index) => { const Icon = item.icon; return <button key={id} aria-pressed={selected === id} aria-label={`${item.name}. ${item.role}`} className={`agent-node n${index} ${selected === id ? 'selected' : ''}`} onClick={() => onSelect(id)}><Icon /><span>{item.name}</span><small>{id === 'integration' ? 'ASSIGNED' : index < 4 ? 'ANALYSING' : 'STANDING BY'}</small></button> })}
       </div>
-      <aside className="agent-panel" aria-live="polite" aria-atomic="true"><span>SELECTED SPECIALIST</span><CurrentIcon /><h2>{current.name}</h2><p>{current.role}</p><dl><dt>CURRENT ACTIVITY</dt><dd>{current.activity}</dd><dt>PRODUCES</dt><dd>{current.output}</dd><dt>HUMAN CONTROL</dt><dd>{current.approval}</dd></dl><button className="main-action" onClick={onNext}>BUILD THE PLAN <ArrowRight /></button></aside>
+      <aside className="agent-panel" aria-live="polite" aria-atomic="true"><span>AGENT IN ACTION</span><CurrentIcon /><h2>{current.name}</h2><p>{current.role}</p><div className="power-grid">{current.powers.map((power) => <b key={power}><Zap />{power}</b>)}</div><dl><dt>TOOLS AVAILABLE</dt><dd>{current.tools}</dd><dt>WORKING NOW</dt><dd>{current.activity}</dd><dt>PRODUCES</dt><dd>{current.output}</dd><dt>HUMAN BOUNDARY</dt><dd>{current.approval}</dd></dl><button className="main-action" onClick={onNext}>BUILD THE PLAN <ArrowRight /></button></aside>
     </div>
     <div className="handoff-theatre"><header><div><span>LIVE AGENT HANDOFFS</span><strong>The application moves through the team</strong></div><button onClick={onReplay}><RefreshCw /> REPLAY</button></header><div className="handoff-flow">{handoffs.map(([name, message, type], index) => <div key={name} className={index < handoffStep ? 'visible' : ''}><span>{String(index + 1).padStart(2, '0')}</span><small>{name}</small><strong>“{message}”</strong><em>{type}</em>{index < handoffs.length - 1 && <ChevronRight />}</div>)}</div></div>
+    <div className="pack-inventory"><header><span>COPILOTWITH AGENT LIBRARY</span><strong>127 DEFINITIONS ACROSS SPECIALIST PACKS</strong></header><div>{packInventory.map(([pack, count]) => <span key={pack}><b>{pack}</b><small>{count}</small></span>)}</div></div>
   </SceneFrame>
 }
 

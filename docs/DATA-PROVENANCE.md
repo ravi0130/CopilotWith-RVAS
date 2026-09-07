@@ -8,17 +8,20 @@ This repository is a customer demonstration accelerator. It presents a clearly m
 
 The CopilotWith repository grounds the specialist-agent model, explicit control boundaries, human stage gates, evidence classification, bounded implementation, and the rule that agents do not merge pull requests, push to production, approve risk, or accept policy exceptions.
 
+The launch-bay domains and named specialist patterns are drawn from repository packs. The displayed total of 127 agent definitions is a repository inventory snapshot and should be updated when packs change.
+
 ## Illustrative replay
 
 The following are demo devices rather than measured customer results:
 
 - Contoso University and all application inventory, dependency, and blocker counts
+- Timed evidence-stream messages, timestamps, and source-file counts
 - The topology, coordinates, timed X-Ray scan, and affected-code counts
 - Plan revisions, readiness scores, generated code diff, test output, container result, and PR number
 - All before/after architecture states and operational outcomes
 - The 127-application portfolio and generated waves
 
-The UI labels the experience as a guided demo, calls the pull request an illustrative replay, and labels projected outcomes.
+The UI labels autoplay as an autonomous demo, calls the pull request an illustrative replay, and labels projected outcomes.
 
 ## Presenter rules
 
