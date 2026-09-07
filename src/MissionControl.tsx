@@ -306,9 +306,10 @@ function MissionControl() {
         {programmeScenes.map((item, index) => <button key={item.id} className={scene === item.id ? 'active' : ''} onClick={() => go(item.id)}><span>{String(index + 1).padStart(2, '0')}</span>{item.verb}</button>)}
       </nav>
       <button className={`demos-button ${scene === 'demos' ? 'active' : ''}`} onClick={openDemos}><Play /> DEMOS</button>
+      <a className="storyline-button" href="https://github.com/ravi0130/CopilotWith-RVAS/blob/main/docs/STORYLINE.md" target="_blank" rel="noreferrer"><FileText /> STORYLINE</a>
       <button className="evidence-button" onClick={() => setEvidenceOpen(true)}><ShieldCheck /> SHOW ME THE EVIDENCE</button>
       <button className="menu-button" onClick={() => setMenuOpen((value) => !value)} aria-label="Open mission navigation" aria-expanded={menuOpen}><Menu /></button>
-      {menuOpen && <nav className="mobile-nav"><button onClick={() => go('possibility')}>GHCP · Art of Possibility</button><button onClick={openDemos}>DEMOS · Demo Studio</button>{programmeScenes.map((item, index) => <button key={item.id} onClick={() => go(item.id)}>{String(index + 1).padStart(2, '0')} · {item.label}</button>)}</nav>}
+      {menuOpen && <nav className="mobile-nav"><button onClick={() => go('possibility')}>GHCP · Art of Possibility</button><button onClick={openDemos}>DEMOS · Demo Studio</button><a href="https://github.com/ravi0130/CopilotWith-RVAS/blob/main/docs/STORYLINE.md" target="_blank" rel="noreferrer">STORYLINE · Page-by-page guide</a>{programmeScenes.map((item, index) => <button key={item.id} onClick={() => go(item.id)}>{String(index + 1).padStart(2, '0')} · {item.label}</button>)}</nav>}
     </header>
 
     <div className="mc-statusbar">
