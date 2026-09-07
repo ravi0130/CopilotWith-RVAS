@@ -1,257 +1,293 @@
 import { useEffect, useState } from 'react'
 import {
-  Activity, AppWindow, ArrowRight, Blocks, Bot, Box, Braces, Check,
-  ChevronRight, CircleAlert, Cloud, Code2, Database, FileText,
-  GitBranch, GitPullRequest, LockKeyhole, Menu, MessageSquareText,
-  Network, PackageCheck, Play, Radar, RefreshCw, Rocket, Search, Server,
-  ShieldCheck, Sparkles, TestTube2, UserCheck, Users, Zap,
+  Activity, ArrowRight, Bot, Box, Braces, Check, ChevronLeft, ChevronRight,
+  CircleAlert, Cloud, Code2, Database, FileCode2, FileText, GitBranch,
+  GitPullRequest, Layers3, LockKeyhole, Menu, MessageSquareText, Network,
+  PackageCheck, Play, Radar, RefreshCw, Rocket, Search, Server, ShieldCheck,
+  Sparkles, TestTube2, UserCheck, Users, X, Zap,
 } from 'lucide-react'
 import './MissionControl.css'
 
-type Persona = 'Executive' | 'Architect' | 'Engineer'
-type Stage = 'mission' | 'xray' | 'agents' | 'plan' | 'transform' | 'prove' | 'future' | 'portfolio'
-type BlockerId = 'runtime' | 'wcf' | 'documents' | 'delivery'
+type Persona = 'Executive' | 'Architect' | 'Developer'
+type Scene = 'brief' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
+type AgentId = 'archaeologist' | 'dependency' | 'planner' | 'architect' | 'integration' | 'security' | 'test' | 'deployment'
 
-const stages: Array<{ id: Stage; short: string; label: string }> = [
-  { id: 'mission', short: '01', label: 'Mission' },
-  { id: 'xray', short: '02', label: 'X-Ray' },
-  { id: 'agents', short: '03', label: 'Agent Fleet' },
-  { id: 'plan', short: '04', label: 'Plan' },
-  { id: 'transform', short: '05', label: 'Transform' },
-  { id: 'prove', short: '06', label: 'Prove' },
-  { id: 'future', short: '07', label: 'Time Machine' },
-  { id: 'portfolio', short: '08', label: 'Scale' },
+const scenes: Array<{ id: Scene; label: string; verb: string }> = [
+  { id: 'brief', label: 'Mission', verb: 'ENTER' },
+  { id: 'xray', label: 'Application X-Ray', verb: 'DISCOVER' },
+  { id: 'fleet', label: 'Agent Team', verb: 'ORCHESTRATE' },
+  { id: 'plan', label: 'Modernisation Plan', verb: 'DECIDE' },
+  { id: 'transform', label: 'Transform', verb: 'MODERNISE' },
+  { id: 'validate', label: 'Proof', verb: 'VALIDATE' },
+  { id: 'time', label: 'Before / After', verb: 'COMPARE' },
+  { id: 'scale', label: 'Portfolio', verb: 'SCALE' },
 ]
 
-const blockers = {
-  runtime: { name: '.NET Framework 4.8', kind: 'Runtime', risk: 'HIGH', files: '47 projects', replacement: 'Modern .NET', agent: 'Runtime Moderniser', icon: Braces, x: 47, y: 16 },
-  wcf: { name: 'WCF Services', kind: 'Integration', risk: 'CRITICAL', files: '4 endpoints', replacement: 'REST + Service Bus', agent: 'Integration Moderniser', icon: Network, x: 22, y: 48 },
-  documents: { name: 'Word Interop', kind: 'Platform', risk: 'HIGH', files: '19 service files', replacement: 'Template engine + Blob', agent: 'Cloud Architect', icon: FileText, x: 75, y: 48 },
-  delivery: { name: 'TeamCity + Octopus', kind: 'Delivery', risk: 'MEDIUM', files: '2 pipelines', replacement: 'GitHub Actions', agent: 'Deployment Engineer', icon: GitBranch, x: 47, y: 79 },
-} satisfies Record<BlockerId, { name: string; kind: string; risk: string; files: string; replacement: string; agent: string; icon: typeof Braces; x: number; y: number }>
+const agents: Record<AgentId, { name: string; role: string; activity: string; output: string; approval: string; icon: typeof Search }> = {
+  archaeologist: { name: 'Application Archaeologist', role: 'Understands the application before anybody changes it.', activity: 'Mapping projects, frameworks, configuration and business boundaries', output: 'Application map · technology inventory · unknowns', approval: 'None for read-only analysis', icon: Search },
+  dependency: { name: 'Dependency Specialist', role: 'Finds compatibility, coupling and migration blockers.', activity: 'Tracing MSMQ producers and consumers across the solution', output: 'Dependency graph · blocker register · affected code', approval: 'Required before dependency replacement', icon: Layers3 },
+  planner: { name: 'Modernisation Strategist', role: 'Turns findings into a sequenced, reversible backlog.', activity: 'Recomputing the lowest-risk path around customer constraints', output: 'Modernisation plan · waves · acceptance criteria', approval: 'Scope and sequencing require approval', icon: Radar },
+  architect: { name: 'Cloud Architect', role: 'Maps legacy patterns to modern Azure services.', activity: 'Comparing Container Apps, App Service and hybrid targets', output: 'Target architecture · ADRs · transition states', approval: 'Architecture choice requires approval', icon: Cloud },
+  integration: { name: 'Integration Moderniser', role: 'Replaces queues, files, APIs and legacy interfaces.', activity: 'Preparing the bounded MSMQ to Service Bus refactor', output: 'Code change · configuration · compatibility tests', approval: 'Breaking contracts require approval', icon: Network },
+  security: { name: 'Security Guardian', role: 'Checks packages, secrets, identity and network exposure.', activity: 'Evaluating CVEs and deployment security controls', output: 'Security findings · exceptions · gate evidence', approval: 'Risk acceptance remains human', icon: ShieldCheck },
+  test: { name: 'Test & Validation Engineer', role: 'Preserves behaviour and proves each change.', activity: 'Freezing the baseline and generating migration tests', output: 'Tests · build results · behavioural comparison', approval: 'Test exceptions require approval', icon: TestTube2 },
+  deployment: { name: 'Deployment Engineer', role: 'Creates container, infrastructure and release assets.', activity: 'Preparing Container Apps and GitHub Actions assets', output: 'Dockerfile · workflow · deployment plan', approval: 'Production deployment requires approval', icon: Rocket },
+}
 
-const agentFleet = [
-  { name: 'Application Archaeologist', role: 'Understands architecture and business logic', icon: Search, status: 'complete', evidence: '380K LOC mapped' },
-  { name: 'Dependency Specialist', role: 'Finds compatibility and coupling risks', icon: Blocks, status: 'complete', evidence: '4 blockers escalated' },
-  { name: 'Modernisation Strategist', role: 'Builds the sequenced, reversible plan', icon: Radar, status: 'active', evidence: '7 phases proposed' },
-  { name: 'Cloud Architect', role: 'Maps legacy patterns to Azure targets', icon: Cloud, status: 'active', evidence: '6 target services' },
-  { name: 'Runtime Moderniser', role: 'Upgrades runtime and dependencies', icon: Braces, status: 'queued', evidence: 'Awaiting approval' },
-  { name: 'Integration Moderniser', role: 'Replaces WCF, queues, files, and APIs', icon: Network, status: 'queued', evidence: 'WCF slice assigned' },
-  { name: 'Security Guardian', role: 'Checks packages, identity, secrets, and exposure', icon: ShieldCheck, status: 'watching', evidence: '2 gates configured' },
-  { name: 'Test Engineer', role: 'Preserves behaviour and validates each slice', icon: TestTube2, status: 'watching', evidence: 'Baseline required' },
+const blockers = [
+  { id: 'runtime', label: '.NET Framework 4.8', detail: 'Windows-only runtime', target: 'Modern .NET', risk: 'HIGH', icon: Braces, x: 50, y: 15 },
+  { id: 'queue', label: 'MSMQ', detail: '3 dependent components', target: 'Azure Service Bus', risk: 'CRITICAL', icon: Network, x: 18, y: 46 },
+  { id: 'files', label: 'Local File System', detail: '14 direct references', target: 'Azure Blob Storage', risk: 'HIGH', icon: FileText, x: 82, y: 46 },
+  { id: 'hosting', label: 'Windows Hosting', detail: 'IIS deployment coupling', target: 'Container Apps', risk: 'HIGH', icon: Server, x: 50, y: 81 },
 ]
 
 const handoffs = [
-  ['Application Archaeologist', 'Found four WCF service boundaries', 'OBSERVED'],
-  ['Dependency Specialist', '47 projects share Framework-era dependencies', 'OBSERVED'],
-  ['Cloud Architect', 'Recommend REST APIs plus asynchronous Service Bus', 'PROPOSED'],
-  ['Modernisation Strategist', 'Pricing extraction becomes the low-risk pilot', 'PROPOSED'],
-  ['Human reviewer', 'Architecture choice required before code changes', 'DECISION'],
+  ['Application Archaeologist', 'Found an MSMQ dependency', 'OBSERVED'],
+  ['Dependency Specialist', '3 components depend on this queue', 'OBSERVED'],
+  ['Cloud Architect', 'Recommend Azure Service Bus', 'PROPOSED'],
+  ['Modernisation Strategist', 'Added migration task MOD-014', 'PROPOSED'],
+  ['Integration Moderniser', 'Refactor and compatibility tests prepared', 'READY'],
+  ['Human Reviewer', 'Architecture decision required', 'DECISION'],
 ]
 
-const constraints = ['Lowest risk', 'Fastest migration', 'No database change', 'Zero downtime', 'No public endpoints']
-
-const portfolioApps = Array.from({ length: 34 }, (_, index) => ({
-  id: index + 1,
-  x: 7 + ((index * 29) % 86),
-  y: 9 + ((index * 47) % 78),
-  size: 7 + (index % 5) * 2,
-  wave: index < 8 ? 1 : index < 22 ? 2 : index < 29 ? 3 : 4,
-}))
+const planOptions = ['Lowest risk', 'Fastest migration', 'Cloud-native', 'Minimal code change']
+const constraints = ['Database unchanged', 'Zero downtime', 'No public endpoints', 'Remain hybrid', 'One component only']
 
 function MissionControl() {
-  const [stage, setStage] = useState<Stage>('mission')
+  const [scene, setScene] = useState<Scene>('brief')
   const [persona, setPersona] = useState<Persona>('Architect')
   const [scan, setScan] = useState(0)
-  const [selectedBlocker, setSelectedBlocker] = useState<BlockerId>('wcf')
-  const [selectedAgent, setSelectedAgent] = useState(5)
-  const [constraint, setConstraint] = useState('Lowest risk')
-  const [target, setTarget] = useState('Azure Container Apps')
-  const [planApproved, setPlanApproved] = useState(false)
-  const [transformRun, setTransformRun] = useState(false)
-  const [proofApproved, setProofApproved] = useState(false)
-  const [future, setFuture] = useState(54)
-  const [wavesGenerated, setWavesGenerated] = useState(false)
+  const [focus, setFocus] = useState('all')
+  const [agent, setAgent] = useState<AgentId>('integration')
+  const [handoffStep, setHandoffStep] = useState(0)
+  const [priority, setPriority] = useState('Lowest risk')
+  const [constraint, setConstraint] = useState('Database unchanged')
+  const [approved, setApproved] = useState(false)
+  const [transformed, setTransformed] = useState(false)
+  const [validated, setValidated] = useState(false)
+  const [modernity, setModernity] = useState(48)
+  const [waves, setWaves] = useState(false)
+  const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const sceneIndex = scenes.findIndex((item) => item.id === scene)
+
   useEffect(() => {
-    if (stage !== 'xray' || scan >= 100) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const frame = window.requestAnimationFrame(() => setScan(100))
-      return () => window.cancelAnimationFrame(frame)
+    if (scene !== 'xray' || scan >= 100) return
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      const frame = requestAnimationFrame(() => setScan(100))
+      return () => cancelAnimationFrame(frame)
     }
-    const timer = window.setInterval(() => setScan((value) => Math.min(100, value + 2)), 28)
-    return () => window.clearInterval(timer)
-  }, [stage, scan])
+    const timer = window.setInterval(() => setScan((value) => Math.min(100, value + 2)), 34)
+    return () => clearInterval(timer)
+  }, [scene, scan])
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' })
-  }, [stage])
+    if (scene !== 'fleet' || handoffStep >= handoffs.length) return
+    const timer = window.setTimeout(() => setHandoffStep((value) => value + 1), 650)
+    return () => clearTimeout(timer)
+  }, [scene, handoffStep])
 
-  const go = (next: Stage) => {
-    setStage(next)
+  const go = (next: Scene) => {
+    setScene(next)
     setMenuOpen(false)
     if (next === 'xray' && scan === 0) setScan(1)
+    if (next === 'fleet') setHandoffStep(0)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  return <div className="mission-shell">
-    <header className="command-bar">
-      <button className="brand" onClick={() => go('mission')}><span><Radar size={19} /></span><div><strong>COPILOTWITH</strong><small>MODERNISATION CONTROL</small></div></button>
-      <nav className="stage-nav" aria-label="Mission stages">
-        {stages.map((item) => <button key={item.id} className={stage === item.id ? 'active' : ''} aria-current={stage === item.id ? 'page' : undefined} onClick={() => go(item.id)}><span>{item.short}</span>{item.label}</button>)}
+  const next = () => sceneIndex < scenes.length - 1 && go(scenes[sceneIndex + 1].id)
+  const previous = () => sceneIndex > 0 && go(scenes[sceneIndex - 1].id)
+
+  return <div className="mc-shell">
+    <header className="mc-topbar">
+      <button className="mc-brand" onClick={() => go('brief')} aria-label="Return to mission start">
+        <span className="brand-mark"><Radar /></span>
+        <span><b>COPILOTWITH</b><small>MODERNISATION MISSION CONTROL</small></span>
+      </button>
+      <nav className="mc-nav" aria-label="Mission journey">
+        {scenes.map((item, index) => <button key={item.id} className={scene === item.id ? 'active' : ''} onClick={() => go(item.id)}><span>{String(index + 1).padStart(2, '0')}</span>{item.verb}</button>)}
       </nav>
-      <div className="mission-meta"><span className="live-dot" /> STORY MODE <small>REPOSITORY-GROUNDED</small></div>
-      <button className="mobile-menu" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}><Menu /></button>
-      {menuOpen && <nav className="mobile-stage-nav">{stages.map((item) => <button key={item.id} onClick={() => go(item.id)}>{item.short} {item.label}</button>)}</nav>}
+      <button className="evidence-button" onClick={() => setEvidenceOpen(true)}><ShieldCheck /> SHOW ME THE EVIDENCE</button>
+      <button className="menu-button" onClick={() => setMenuOpen((value) => !value)} aria-label="Open mission navigation" aria-expanded={menuOpen}><Menu /></button>
+      {menuOpen && <nav className="mobile-nav">{scenes.map((item, index) => <button key={item.id} onClick={() => go(item.id)}>{String(index + 1).padStart(2, '0')} · {item.label}</button>)}</nav>}
     </header>
 
-    <div className="persona-bar">
-      <span>VIEW AS</span>
-      {(['Executive', 'Architect', 'Engineer'] as Persona[]).map((item) => <button key={item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>{item}</button>)}
-      <div className="persona-context">{persona === 'Executive' ? 'Risk · waves · readiness' : persona === 'Architect' ? 'Topology · patterns · decisions' : 'Code · tests · pull requests'}</div>
+    <div className="mc-statusbar">
+      <span><i /> GUIDED DEMO</span>
+      <span className="app-status"><b>ACTIVE APPLICATION</b> CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8</span>
+      <div className="persona-switch"><small>VIEW AS</small>{(['Executive', 'Architect', 'Developer'] as Persona[]).map((item) => <button key={item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>{item}</button>)}</div>
     </div>
 
-    <main className="mission-main">
-      {stage === 'mission' && <MissionScreen onStart={() => go('xray')} />}
-      {stage === 'xray' && <XrayScreen scan={scan} selected={selectedBlocker} onSelect={setSelectedBlocker} onNext={() => go('agents')} />}
-      {stage === 'agents' && <AgentsScreen selected={selectedAgent} onSelect={setSelectedAgent} onNext={() => go('plan')} />}
-      {stage === 'plan' && <PlanScreen constraint={constraint} target={target} approved={planApproved} onConstraint={setConstraint} onTarget={setTarget} onApprove={() => setPlanApproved(true)} onNext={() => go('transform')} />}
-      {stage === 'transform' && <TransformScreen running={transformRun} onRun={() => setTransformRun(true)} onNext={() => go('prove')} />}
-      {stage === 'prove' && <ProofScreen approved={proofApproved} onApprove={() => setProofApproved(true)} onNext={() => go('future')} />}
-      {stage === 'future' && <FutureScreen value={future} onChange={setFuture} onNext={() => go('portfolio')} />}
-      {stage === 'portfolio' && <PortfolioScreen generated={wavesGenerated} onGenerate={() => setWavesGenerated(true)} onRestart={() => go('mission')} />}
+    <main className="mc-main">
+      {scene === 'brief' && <BriefScene onStart={() => go('xray')} />}
+      {scene === 'xray' && <XrayScene scan={scan} focus={focus} onFocus={setFocus} onNext={next} />}
+      {scene === 'fleet' && <FleetScene selected={agent} onSelect={setAgent} handoffStep={handoffStep} onReplay={() => setHandoffStep(0)} onNext={next} />}
+      {scene === 'plan' && <PlanScene priority={priority} constraint={constraint} approved={approved} onPriority={(value) => { setPriority(value); setApproved(false) }} onConstraint={(value) => { setConstraint(value); setApproved(false) }} onApprove={() => setApproved(true)} onNext={next} />}
+      {scene === 'transform' && <TransformScene transformed={transformed} onTransform={() => setTransformed(true)} onNext={next} />}
+      {scene === 'validate' && <ValidateScene validated={validated} onValidate={() => setValidated(true)} onNext={next} />}
+      {scene === 'time' && <TimeScene value={modernity} onChange={setModernity} onNext={next} />}
+      {scene === 'scale' && <ScaleScene waves={waves} persona={persona} onGenerate={() => setWaves(true)} onRestart={() => go('brief')} />}
     </main>
+
+    {scene !== 'brief' && <footer className="mission-footer">
+      <button onClick={previous}><ChevronLeft /> PREVIOUS</button>
+      <div><span>{scenes[sceneIndex].verb}</span><strong>{scenes[sceneIndex].label}</strong><i style={{ width: `${((sceneIndex + 1) / scenes.length) * 100}%` }} /></div>
+      <button onClick={next} disabled={sceneIndex === scenes.length - 1} aria-label={sceneIndex === scenes.length - 1 ? 'Final mission scene' : 'Next mission scene'}>NEXT <ChevronRight /></button>
+    </footer>}
+
+    {evidenceOpen && <EvidenceDrawer onClose={() => setEvidenceOpen(false)} transformed={transformed} validated={validated} />}
   </div>
 }
 
-function MissionScreen({ onStart }: { onStart: () => void }) {
-  return <section className="mission-launch">
-    <div className="launch-copy">
-      <span className="eyebrow">COPILOTWITH // MODERNISATION MISSION CONTROL</span>
-      <h1>Give us an application.</h1>
-      <p>Watch a governed virtual engineering team understand it, challenge it, transform one bounded slice, and prove what changed.</p>
-      <div className="mission-sequence"><span>EXPLORE</span><ChevronRight /><span>DIAGNOSE</span><ChevronRight /><span>DECIDE</span><ChevronRight /><span>MODERNISE</span><ChevronRight /><span>PROVE</span></div>
+function BriefScene({ onStart }: { onStart: () => void }) {
+  return <section className="brief-scene scene-enter">
+    <div className="brief-grid">
+      <div className="brief-copy">
+        <span className="kicker"><i /> GHCP APP MODERNISATION · GUIDED EXPERIENCE</span>
+        <h1>What if your application could tell you how it wants to be modernised?</h1>
+        <p>Hand CopilotWith a legacy application. Watch GitHub Copilot assess it, plan the work, change the code, fix the build, create tests, containerise it and prepare it for Azure, while specialist agents and human gates keep the programme controlled.</p>
+        <button className="hero-action" onClick={onStart}><Play fill="currentColor" /> START A MODERNISATION MISSION <ArrowRight /></button>
+        <div className="journey-line"><span>DISCOVER</span><i /><span>DESIGN</span><i /><span>SECURE</span><i /><span>MODERNISE</span><i /><span>VALIDATE</span><i /><span>DEPLOY</span></div>
+      </div>
+      <div className="application-stage" aria-label="Selected application">
+        <div className="stage-rings"><span /><span /><span /></div>
+        <div className="application-orb">
+          <span className="orb-status">MODERNISATION READY</span>
+          <Server />
+          <small>LEGACY APPLICATION</small>
+          <h2>Contoso University</h2>
+          <p>.NET Framework 4.8 · Windows · SQL · MSMQ</p>
+          <div><b>9</b><span>projects</span><b>23</b><span>dependencies</span><b>4</b><span>blockers</span></div>
+        </div>
+        <div className="satellite s1">MSMQ</div><div className="satellite s2">SQL</div><div className="satellite s3">IIS</div><div className="satellite s4">FILES</div>
+      </div>
     </div>
-    <div className="application-picker" aria-label="Choose an application">
-      <button className="app-choice selected" onClick={onStart}>
-        <span className="choice-state"><span /> READY FOR ANALYSIS</span>
-        <AppWindow />
-        <div><small>DETERMINISTIC STORY</small><h2>PolicyHub</h2><p>Contoso Insurance · .NET Framework 4.8</p></div>
-        <strong>47 projects</strong><strong>380K LOC</strong><strong>4 WCF services</strong>
-        <span className="launch-action"><Play size={16} fill="currentColor" /> START MODERNISATION MISSION</span>
-      </button>
-      <button className="app-choice north-star" onClick={onStart}>
-        <span className="choice-state">REFERENCE ARCHITECTURE</span><Cloud />
-        <div><small>EXPLORE NORTH STAR</small><h2>eShop</h2><p>Modern .NET · services · cloud-ready</p></div>
-        <span className="launch-action">COMPARE TARGET <ArrowRight size={16} /></span>
-      </button>
-      <button className="app-choice connect" onClick={onStart}>
-        <span className="choice-state">CONNECTED MODE</span><GitBranch />
-        <div><small>BRING YOUR OWN REPOSITORY</small><h2>Your application</h2><p>Connect GitHub for a live assessment</p></div>
-        <span className="launch-action">CONNECT REPOSITORY <ArrowRight size={16} /></span>
-      </button>
-    </div>
-    <div className="launch-foot"><ShieldCheck /><span>Agents analyse and recommend. Humans approve architecture, scope, risk, and deployment.</span><small>DEMO FACTS FROM COPILOTWITH SAMPLE OUTPUTS</small></div>
+    <div className="promise-strip"><div><Bot /><span><small>GITHUB COPILOT</small>Analysis · planning · transformation · testing</span></div><ArrowRight /><div><Radar /><span><small>COPILOTWITH</small>Specialists · governance · evidence · programme scale</span></div><ArrowRight /><div><Cloud /><span><small>AZURE</small>Target architecture · deployment · operations</span></div></div>
   </section>
 }
 
-function XrayScreen({ scan, selected, onSelect, onNext }: { scan: number; selected: BlockerId; onSelect: (id: BlockerId) => void; onNext: () => void }) {
-  const current = blockers[selected]
-  const CurrentIcon = current.icon
-  return <section className="control-screen xray-screen">
-    <ScreenHeader step="02 // APPLICATION X-RAY" title="The application tells us where it hurts." copy="Repository evidence becomes a living topology. Red nodes are blockers, not decoration." agent="APPLICATION ARCHAEOLOGIST" />
-    <div className="xray-grid">
-      <div className="topology-panel">
-        <div className="panel-toolbar"><span><Activity /> SCAN {scan}%</span><div className="scan-progress"><i style={{ width: `${scan}%` }} /></div><small>23 COMPONENTS · 4 BLOCKERS</small></div>
-        <div className="app-topology">
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="50" y1="50" x2="47" y2="16"/><line x1="50" y1="50" x2="22" y2="48"/><line x1="50" y1="50" x2="75" y2="48"/><line x1="50" y1="50" x2="47" y2="79"/></svg>
-          <div className="topology-core"><Server /><strong>PolicyHub</strong><span>IIS monolith</span></div>
-          {(Object.entries(blockers) as Array<[BlockerId, typeof blockers[BlockerId]]>).map(([id, item], index) => { const Icon = item.icon; return <button key={id} disabled={scan < 20 + index * 17} className={`topology-node ${selected === id ? 'selected' : ''}`} style={{ left: `${item.x}%`, top: `${item.y}%` }} onClick={() => onSelect(id)}><Icon /><strong>{item.name}</strong><small>{item.risk}</small></button> })}
-          <div className="topology-context db"><Database /> SQL Server 2017</div><div className="topology-context users"><Users /> 2 portals</div>
-          <div className="scanner" style={{ left: `${scan}%` }} />
+function XrayScene({ scan, focus, onFocus, onNext }: { scan: number; focus: string; onFocus: (value: string) => void; onNext: () => void }) {
+  const selected = blockers.find((item) => item.id === focus) ?? blockers[1]
+  const SelectedIcon = selected.icon
+  return <SceneFrame number="01" eyebrow="UNDERSTAND AN UNFAMILIAR APPLICATION" title="Copilot turns source code into an application X-Ray." summary="The graph is the explanation. Ask a question and the application shows you the answer." ghcp="Assesses the codebase, identifies upgrade blockers and traces affected code." copilotwith="Assigns evidence to specialists and keeps findings separate from decisions.">
+    <div className="xray-workspace">
+      <div className="xray-canvas">
+        <div className="scan-head"><span><Activity /> ANALYSING CONTOSO UNIVERSITY</span><div><i style={{ width: `${scan}%` }} /></div><b>{scan}%</b></div>
+        <div className="topology">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none">{blockers.map((item) => <line key={item.id} x1="50" y1="50" x2={item.x} y2={item.y} />)}</svg>
+          <div className="topology-centre"><Code2 /><small>APPLICATION</small><strong>Contoso University</strong><span>ASP.NET · .NET Framework</span></div>
+          {blockers.map((item, index) => { const Icon = item.icon; const highlighted = focus === 'all' || focus === item.id || (focus === 'containers' && ['runtime', 'queue', 'files', 'hosting'].includes(item.id)); return <button key={item.id} disabled={scan < 24 + index * 16} aria-pressed={focus === item.id} className={`blocker-node ${highlighted ? 'highlighted' : 'dimmed'}`} style={{ left: `${item.x}%`, top: `${item.y}%` }} onClick={() => onFocus(item.id)}><Icon /><span><strong>{item.label}</strong><small>{item.detail}</small></span><b>{item.risk}</b></button> })}
+          <span className="scan-beam" style={{ left: `${scan}%` }} />
         </div>
+        <div className="copilot-prompt"><MessageSquareText /><div><small>ASK COPILOTWITH ABOUT THIS APPLICATION</small><strong>{focus === 'containers' ? 'Four components prevent a direct move to containers.' : `Explain ${selected.label} and show the affected modernisation path.`}</strong></div><button onClick={() => onFocus('containers')}>What prevents containerisation?</button><button onClick={() => onFocus('queue')}>Show messaging blockers</button></div>
       </div>
-      <aside className="inspector-panel">
-        <span className="risk-label"><CircleAlert /> MODERNISATION BLOCKER</span>
-        <CurrentIcon className="inspector-icon" />
-        <small>{current.kind.toUpperCase()}</small><h2>{current.name}</h2>
-        <div className="inspection-facts"><p><span>Cloud readiness</span><strong>LOW</strong></p><p><span>Affected scope</span><strong>{current.files}</strong></p><p><span>Recommended pattern</span><strong>{current.replacement}</strong></p><p><span>Assigned specialist</span><strong>{current.agent}</strong></p></div>
-        <div className="ask-strip"><MessageSquareText /><span><small>ASK COPILOTWITH</small>Why is this blocking cloud readiness?</span></div>
-        <button className="primary-action" onClick={onNext}>ACTIVATE AGENT FLEET <ArrowRight /></button>
+      <aside className="finding-panel" aria-live="polite" aria-label="Selected blocker details">
+        <span className="danger-label"><CircleAlert /> MODERNISATION BLOCKER</span>
+        <SelectedIcon />
+        <small>CURRENT DEPENDENCY</small><h2>{selected.label}</h2>
+        <p>{selected.detail}. This dependency ties the application to its current Windows-hosted operating model.</p>
+        <dl><div><dt>Cloud readiness</dt><dd>LOW</dd></div><div><dt>Recommended pattern</dt><dd>{selected.target}</dd></div><div><dt>Affected code</dt><dd>{selected.id === 'queue' ? '17 references · 4 projects' : selected.detail}</dd></div><div><dt>Assigned agent</dt><dd>{selected.id === 'queue' ? 'Integration Moderniser' : 'Cloud Architect'}</dd></div></dl>
+        <button className="main-action" onClick={onNext}>MEET THE AGENT TEAM <ArrowRight /></button>
       </aside>
     </div>
-  </section>
+  </SceneFrame>
 }
 
-function AgentsScreen({ selected, onSelect, onNext }: { selected: number; onSelect: (index: number) => void; onNext: () => void }) {
-  const agent = agentFleet[selected]
-  const AgentIcon = agent.icon
-  return <section className="control-screen agents-screen">
-    <ScreenHeader step="03 // AGENT FLEET" title="Meet the digital engineering team." copy="Each specialist has a bounded mission, explicit evidence, and a point where it must stop for a person." agent="COPILOTWITH ORCHESTRATOR" />
-    <div className="agents-layout">
-      <div className="constellation">
-        <div className="orchestrator"><Radar /><strong>COPILOTWITH</strong><span>ORCHESTRATOR</span></div>
-        {agentFleet.map((item, index) => { const Icon = item.icon; return <button key={item.name} className={`agent-orbit a${index} ${selected === index ? 'selected' : ''}`} onClick={() => onSelect(index)}><Icon /><span>{item.name}</span><small>{item.status}</small></button> })}
+function FleetScene({ selected, onSelect, handoffStep, onReplay, onNext }: { selected: AgentId; onSelect: (value: AgentId) => void; handoffStep: number; onReplay: () => void; onNext: () => void }) {
+  const current = agents[selected]
+  const CurrentIcon = current.icon
+  return <SceneFrame number="02" eyebrow="MEET YOUR DIGITAL ENGINEERING TEAM" title="Specialist agents take ownership, then hand work forward." summary="This is not one chatbot doing everything. It is an engineering organisation with expertise, tools and boundaries." ghcp="Runs specialised custom agents for recurring analysis and implementation tasks." copilotwith="Orchestrates missions, handoffs, evidence and mandatory human control points.">
+    <div className="fleet-workspace">
+      <div className="constellation-panel">
+        <div className="orchestrator-core"><Radar /><strong>COPILOTWITH</strong><span>ORCHESTRATOR</span><i /></div>
+        {(Object.entries(agents) as Array<[AgentId, typeof agents[AgentId]]>).map(([id, item], index) => { const Icon = item.icon; return <button key={id} aria-pressed={selected === id} aria-label={`${item.name}. ${item.role}`} className={`agent-node n${index} ${selected === id ? 'selected' : ''}`} onClick={() => onSelect(id)}><Icon /><span>{item.name}</span><small>{id === 'integration' ? 'ASSIGNED' : index < 4 ? 'ANALYSING' : 'STANDING BY'}</small></button> })}
       </div>
-      <aside className="agent-dossier"><span className="agent-number">AGENT {String(selected + 1).padStart(2, '0')}</span><AgentIcon /><h2>{agent.name}</h2><p>{agent.role}.</p><div className="mission-facts"><span>MISSION</span><strong>{selected === 5 ? 'Replace the WCF integration boundary without changing business behaviour.' : agent.role}</strong><span>CURRENT EVIDENCE</span><strong>{agent.evidence}</strong><span>HUMAN APPROVAL</span><strong>Required before architecture or code changes</strong></div><button className="primary-action" onClick={onNext}>WATCH THE HANDOFFS <ArrowRight /></button></aside>
+      <aside className="agent-panel" aria-live="polite" aria-atomic="true"><span>SELECTED SPECIALIST</span><CurrentIcon /><h2>{current.name}</h2><p>{current.role}</p><dl><dt>CURRENT ACTIVITY</dt><dd>{current.activity}</dd><dt>PRODUCES</dt><dd>{current.output}</dd><dt>HUMAN CONTROL</dt><dd>{current.approval}</dd></dl><button className="main-action" onClick={onNext}>BUILD THE PLAN <ArrowRight /></button></aside>
     </div>
-    <div className="handoff-strip">{handoffs.map(([name, message, type], index) => <div key={name} className={type.toLowerCase()}><span>{index + 1}</span><small>{name}</small><strong>{message}</strong><em>{type}</em></div>)}</div>
-  </section>
+    <div className="handoff-theatre"><header><div><span>LIVE AGENT HANDOFFS</span><strong>The application moves through the team</strong></div><button onClick={onReplay}><RefreshCw /> REPLAY</button></header><div className="handoff-flow">{handoffs.map(([name, message, type], index) => <div key={name} className={index < handoffStep ? 'visible' : ''}><span>{String(index + 1).padStart(2, '0')}</span><small>{name}</small><strong>“{message}”</strong><em>{type}</em>{index < handoffs.length - 1 && <ChevronRight />}</div>)}</div></div>
+  </SceneFrame>
 }
 
-function PlanScreen({ constraint, target, approved, onConstraint, onTarget, onApprove, onNext }: { constraint: string; target: string; approved: boolean; onConstraint: (value: string) => void; onTarget: (value: string) => void; onApprove: () => void; onNext: () => void }) {
+function PlanScene({ priority, constraint, approved, onPriority, onConstraint, onApprove, onNext }: { priority: string; constraint: string; approved: boolean; onPriority: (value: string) => void; onConstraint: (value: string) => void; onApprove: () => void; onNext: () => void }) {
   const tasks = [
-    ['MOD-001', 'Freeze behavioural baseline', 'Test Engineer', '2 days'],
-    ['MOD-002', 'Extract pricing boundary', 'Runtime Moderniser', '8 days'],
-    ['MOD-003', 'Replace WCF with REST contract', 'Integration Moderniser', '6 days'],
-    ['MOD-004', `Deploy pilot to ${target}`, 'Deployment Engineer', '3 days'],
+    ['MOD-001', 'Freeze existing behaviour with characterisation tests', 'Test Engineer'],
+    ['MOD-007', 'Upgrade shared libraries to modern .NET', 'Runtime Moderniser'],
+    ['MOD-014', 'Replace MSMQ boundary with Azure Service Bus', 'Integration Moderniser'],
+    ['MOD-019', constraint === 'Database unchanged' ? 'Retain SQL schema behind compatibility layer' : 'Externalise persistence boundary', 'Cloud Architect'],
+    ['MOD-024', 'Containerise and create GitHub Actions workflow', 'Deployment Engineer'],
   ]
-  return <section className="control-screen plan-screen">
-    <ScreenHeader step="04 // MODERNISATION PATH BUILDER" title="The plan bends around reality." copy="Change the objective, platform, or constraint. The sequence, agents, and risk respond." agent="MODERNISATION STRATEGIST" />
-    <div className="plan-layout">
-      <aside className="plan-controls"><label>OPTIMISE FOR</label>{constraints.map((item) => <button key={item} className={constraint === item ? 'selected' : ''} onClick={() => onConstraint(item)}><span />{item}</button>)}<label>TARGET PLATFORM</label><select value={target} onChange={(event) => onTarget(event.target.value)}><option>Azure Container Apps</option><option>Azure App Service</option><option>AKS</option><option>Hybrid</option></select><div className="plan-score"><span>PROJECTED READINESS</span><strong>{constraint === 'Lowest risk' ? 91 : constraint === 'Fastest migration' ? 84 : 88}</strong><small>Illustrative estimate</small></div></aside>
-      <div className="roadmap-panel"><div className="roadmap-head"><span>GENERATED PLAN · REVISION 03</span><strong>{constraint.toUpperCase()}</strong></div>{tasks.map(([id, title, owner, effort], index) => <div className="roadmap-task" key={id}><span>{String(index + 1).padStart(2, '0')}</span><div><small>{id}</small><strong>{title}</strong><em>{owner}</em></div><b>{effort}</b><ChevronRight /></div>)}<div className="plan-decision"><UserCheck /><div><small>DECISION REQUIRED</small><strong>Approve the pricing-service pilot and target platform</strong><p>Agents cannot begin code changes until a human accepts scope and architecture.</p></div>{approved ? <span className="approved-mark"><Check /> APPROVED</span> : <button className="primary-action" onClick={onApprove}>APPROVE PLAN</button>}</div>{approved && <button className="primary-action continue" onClick={onNext}>BEGIN TRANSFORMATION <ArrowRight /></button>}</div>
+  return <SceneFrame number="03" eyebrow="HUMAN-DIRECTED MODERNISATION" title="Break the plan. Watch it adapt." summary="Real programmes have constraints. Change one and Copilot recomputes the sequence, effort, risk and assigned agents." ghcp="Produces a customisable plan from assessment findings and iterates through blockers." copilotwith="Applies programme patterns, records assumptions and requires approval before change.">
+    <div className="plan-workspace">
+      <aside className="plan-config"><label>OPTIMISE FOR</label>{planOptions.map((item) => <button key={item} className={priority === item ? 'selected' : ''} onClick={() => onPriority(item)}><i />{item}</button>)}<label>ADD A REAL-WORLD CONSTRAINT</label><select value={constraint} onChange={(event) => onConstraint(event.target.value)}>{constraints.map((item) => <option key={item}>{item}</option>)}</select><div className="plan-impact"><span>PROJECTED READINESS</span><strong>{priority === 'Lowest risk' ? '91' : priority === 'Fastest migration' ? '84' : '88'}<small>/100</small></strong><p>Demo estimate · not a measured customer outcome</p></div></aside>
+      <div className="generated-plan"><header><div><small>GHCP APP MODERNISATION PLAN</small><h2>Lowest-risk path to Azure Container Apps</h2></div><span>REVISION {constraint === 'Database unchanged' ? '04' : '05'}</span></header>{tasks.map(([id, title, owner], index) => <div className="plan-task" key={id}><span>{String(index + 1).padStart(2, '0')}</span><div><small>{id}</small><strong>{title}</strong><em>{owner}</em></div><b>{index < 2 ? 'FOUNDATION' : index < 4 ? 'TRANSFORM' : 'DELIVER'}</b></div>)}<div className="decision-gate"><LockKeyhole /><div><small>DECISION REQUIRED</small><strong>Approve Azure Service Bus and the bounded messaging pilot</strong><p>Agents can recommend and prepare. Architecture, scope and risk remain human decisions.</p></div>{approved ? <span className="approved"><Check /> APPROVED</span> : <button onClick={onApprove}>APPROVE RECOMMENDATION</button>}</div>{approved && <button className="main-action plan-next" onClick={onNext}>MODERNISE THE MESSAGING COMPONENT <ArrowRight /></button>}</div>
     </div>
-  </section>
+  </SceneFrame>
 }
 
-function TransformScreen({ running, onRun, onNext }: { running: boolean; onRun: () => void; onNext: () => void }) {
-  return <section className="control-screen transform-screen">
-    <ScreenHeader step="05 // TRANSFORMATION" title="One component. One reviewable change." copy="The approved slice becomes code, tests, deployment assets, and a pull request." agent="INTEGRATION MODERNISER" />
-    <div className="transform-layout">
-      <div className="code-workbench"><div className="editor-tabs"><span className="old active">BEFORE · RatingEngine.svc</span><span className={running ? 'new ready' : 'new'}>AFTER · PricingEndpoint.cs</span><small>PR #47</small></div><div className="code-columns"><pre className="legacy-code"><code>{`[ServiceContract]\npublic interface IRatingEngine {\n  [OperationContract]\n  Premium Calculate(Policy policy);\n}\n\n// IIS-hosted WCF endpoint\n// Windows-only runtime\n// Shared database context`}</code></pre><pre className={running ? 'modern-code revealed' : 'modern-code'}><code>{running ? `app.MapPost("/api/pricing",\n  async (Policy policy, IPricingEngine engine) =>\n    Results.Ok(await engine.CalculateAsync(policy)));\n\n// .NET API contract\n// Container-ready boundary\n// Independently testable` : '// Select “Modernise this component”\n// to prepare the bounded change.'}</code></pre></div><div className="diff-status"><span>FILES <strong>{running ? '14 changed' : '—'}</strong></span><span>DIFF <strong>{running ? '+228 / -163' : '—'}</strong></span><span>PACKAGE <strong>{running ? '3 updated' : '—'}</strong></span></div></div>
-      <aside className="execution-panel"><span>ACTIVE SPECIALISTS</span>{[['Integration Moderniser', Code2], ['Test Engineer', TestTube2], ['Security Guardian', ShieldCheck], ['Deployment Engineer', Rocket]].map(([name, Icon], index) => { const TypedIcon = Icon as typeof Code2; return <div className={running ? 'execution-step complete' : 'execution-step'} key={String(name)}><TypedIcon /><div><strong>{name as string}</strong><small>{running ? ['Refactor prepared', '47 tests passed', 'No critical findings', 'Container assets ready'][index] : 'Waiting for execution'}</small></div>{running ? <Check /> : <span />}</div> })}{running ? <><div className="terminal"><span>$ dotnet test</span><p>Passed! 47 tests in 8.4s</p><span>$ docker build</span><p>Successfully tagged policyhub-pricing:47</p></div><button className="primary-action" onClick={onNext}>OPEN EVIDENCE GATE <ArrowRight /></button></> : <button className="primary-action" onClick={onRun}><Zap /> MODERNISE THIS COMPONENT</button>}</aside>
+function TransformScene({ transformed, onTransform, onNext }: { transformed: boolean; onTransform: () => void; onNext: () => void }) {
+  return <SceneFrame number="04" eyebrow="BOUNDED CODE TRANSFORMATION" title="Now the application actually changes." summary="The approved task becomes a reviewable code change, updated configuration, tests and deployment assets." ghcp="Implements the recommendation, fixes build issues, creates tests and container assets." copilotwith="Keeps the change bounded, captures provenance and routes the result to independent gates.">
+    <div className="transform-workspace">
+      <div className="editor-shell"><header><span><FileCode2 /> BEFORE · QueuePublisher.cs</span><span className={transformed ? 'ready' : ''}><Code2 /> AFTER · ServiceBusPublisher.cs</span><b>MOD-014</b></header><div className="code-compare"><pre className="before"><code>{`using System.Messaging;\n\npublic void Publish(Enrollment item)\n{\n    var queue = new MessageQueue(\n        @".\\Private$\\enrollment");\n    queue.Send(item);\n}\n\n// Windows-only MSMQ dependency`}</code></pre><pre className={transformed ? 'after revealed' : 'after'}><code>{transformed ? `public async Task PublishAsync(\n    Enrollment item, CancellationToken ct)\n{\n    var payload = BinaryData.FromObjectAsJson(item);\n    await sender.SendMessageAsync(\n        new ServiceBusMessage(payload), ct);\n}\n\n// Cloud-ready messaging abstraction` : `// Integration Moderniser waiting\n// for an approved architecture decision.\n\n// No code has been changed yet.`}</code></pre></div><footer><span>FILES <b>{transformed ? '14 changed' : '—'}</b></span><span>DIFF <b>{transformed ? '+228 / -163' : '—'}</b></span><span>PACKAGES <b>{transformed ? '3 updated' : '—'}</b></span><span>TESTS <b>{transformed ? '12 added' : '—'}</b></span></footer></div>
+      <aside className="run-panel"><span>AGENT EXECUTION</span>{[['Integration Moderniser', 'Refactor messaging boundary', Code2], ['Test Engineer', 'Create compatibility tests', TestTube2], ['Security Guardian', 'Inspect identity and packages', ShieldCheck], ['Deployment Engineer', 'Add container configuration', Box]].map(([name, task, Icon], index) => { const TypedIcon = Icon as typeof Code2; return <div className={transformed ? 'run-step complete' : 'run-step'} key={String(name)}><TypedIcon /><div><strong>{name as string}</strong><small>{transformed ? ['Refactor prepared', '12 tests created', 'Identity control added', 'Container assets ready'][index] : task as string}</small></div>{transformed ? <Check /> : <i />}</div> })}{transformed ? <><div className="terminal-output"><span>$ dotnet build</span><p>Build succeeded. 0 Error(s)</p><span>$ dotnet test</span><p>47 passed in 8.4s</p></div><button className="main-action" onClick={onNext}>PROVE THE CHANGE <ArrowRight /></button></> : <button className="transform-button" onClick={onTransform}><Zap /> MODERNISE THIS COMPONENT</button>}</aside>
     </div>
-  </section>
+  </SceneFrame>
 }
 
-function ProofScreen({ approved, onApprove, onNext }: { approved: boolean; onApprove: () => void; onNext: () => void }) {
-  const checks = [['Build', 'Succeeded', PackageCheck], ['Unit tests', '47 / 47 passed', TestTube2], ['Security', '0 critical findings', ShieldCheck], ['Container', 'Image produced', Box], ['Pull request', '#47 ready for review', GitPullRequest]]
-  return <section className="control-screen proof-screen">
-    <ScreenHeader step="06 // PROOF, NOT PROMISES" title="Show me the evidence." copy="Illustrative replay of the evidence a real agent run must produce and retain." agent="QUALITY + GOVERNANCE" />
-    <div className="proof-console"><div className="proof-grid">{checks.map(([name, result, Icon]) => { const TypedIcon = Icon as typeof PackageCheck; return <div key={String(name)}><TypedIcon /><span>{name as string}</span><strong>{result as string}</strong><Check /></div> })}</div><div className="pr-preview"><div className="pr-title"><GitPullRequest /><div><small>PR #47 · ILLUSTRATIVE</small><h2>Extract pricing service boundary</h2></div><span>14 files changed</span></div><p>Generated by Integration Moderniser · validated by Test Engineer and Security Guardian</p><div className="pr-files"><span>PricingEndpoint.cs <b>+48</b></span><span>PricingEngineTests.cs <b>+126</b></span><span>Dockerfile <b>+31</b></span><span>architecture-decision-004.md <b>+23</b></span></div></div><aside className={approved ? 'human-gate approved' : 'human-gate'}><LockKeyhole /><span>GATE 06 · HUMAN REVIEW</span><h2>{approved ? 'Approved to progress.' : 'Agents cannot approve their own work.'}</h2><p>{approved ? 'Decision, evidence set, conditions, and reviewer are now attached to the programme record.' : 'Review the architecture change, evidence, rollback, and deployment conditions.'}</p>{approved ? <button className="primary-action" onClick={onNext}>OPEN TIME MACHINE <ArrowRight /></button> : <button className="primary-action" onClick={onApprove}><UserCheck /> APPROVE & CONTINUE</button>}</aside></div>
-  </section>
+function ValidateScene({ validated, onValidate, onNext }: { validated: boolean; onValidate: () => void; onNext: () => void }) {
+  const checks = [
+    ['Build', 'Modern .NET solution', 'PASSED', PackageCheck],
+    ['Behaviour', '47 baseline tests', 'PASSED', TestTube2],
+    ['Security', 'Secrets, CVEs, identity', '2 RESOLVED', ShieldCheck],
+    ['Container', 'Linux image + health probe', 'PASSED', Box],
+    ['Pull request', 'Code, ADR and rollback', '#47 READY', GitPullRequest],
+  ]
+  return <SceneFrame number="05" eyebrow="SECURITY · TEST · REVIEW" title="Proof, not AI theatre." summary="Every claim resolves to evidence. Independent agents check the change before a human decides whether it can progress." ghcp="Runs the build/fix/test loop, security analysis and pull-request preparation." copilotwith="Defines the gates, separates maker from checker and preserves the approval record.">
+    <div className="proof-workspace">
+      <div className="proof-list">{checks.map(([name, detail, status, Icon], index) => { const TypedIcon = Icon as typeof PackageCheck; return <div key={String(name)} className={validated ? 'passed' : ''}><TypedIcon /><span><small>GATE {String(index + 1).padStart(2, '0')}</small><strong>{name as string}</strong><p>{detail as string}</p></span><b>{validated ? status as string : 'WAITING'}</b>{validated ? <Check /> : <i />}</div> })}</div>
+      <div className="security-gate"><header><ShieldCheck /><div><small>GATE 03 · SECURITY REVIEW</small><h2>Two findings required action</h2></div></header><div className="security-items"><span><Check /> Secrets exposure <b>NONE</b></span><span><Check /> Unsupported package <b>UPDATED</b></span><span><Check /> Managed identity <b>CONFIGURED</b></span><span><Check /> Public network access <b>DISABLED</b></span></div>{validated ? <div className="pr-card"><GitPullRequest /><div><small>PR #47 · ILLUSTRATIVE REPLAY</small><strong>Modernise enrollment messaging</strong><p>14 files · 12 tests · ADR · rollback plan</p></div><span>READY FOR HUMAN REVIEW</span></div> : <button className="validate-button" onClick={onValidate}><ShieldCheck /> RUN VALIDATION GATES</button>}</div>
+      <aside className={validated ? 'review-panel ready' : 'review-panel'}><UserCheck /><span>TARGETED HUMAN REVIEW</span><h2>{validated ? 'Evidence complete. The decision is yours.' : 'Agents cannot approve their own work.'}</h2><p>Review architecture impact, test evidence, security findings and rollback conditions before progression.</p>{validated && <button className="main-action" onClick={onNext}>APPROVE & SEE THE FUTURE <ArrowRight /></button>}</aside>
+    </div>
+  </SceneFrame>
 }
 
-function FutureScreen({ value, onChange, onNext }: { value: number; onChange: (value: number) => void; onNext: () => void }) {
-  const modern = value > 50
-  return <section className="control-screen future-screen">
-    <ScreenHeader step="07 // MODERNISATION TIME MACHINE" title="Drag the architecture through the change." copy="The transformation is not a slide. It is the accumulated effect of approved, evidenced slices." agent="ARCHITECTURE VIEW" />
-    <div className="time-machine"><div className="time-labels"><span>LEGACY APPLICATION</span><strong>{value}% MODERNISED</strong><span>MODERN PRODUCT</span></div><input aria-label="Modernisation progress" type="range" min="0" max="100" value={value} onChange={(event) => onChange(Number(event.target.value))} /><div className="architecture-morph"><div className={modern ? 'arch-side legacy faded' : 'arch-side legacy'}><span>BEFORE</span>{[['Windows Server', Server], ['.NET Framework 4.8', Braces], ['WCF', Network], ['Word Interop', FileText], ['TeamCity', GitBranch]].map(([name, Icon]) => { const TypedIcon = Icon as typeof Server; return <div key={String(name)}><TypedIcon />{name as string}</div> })}</div><div className="morph-core"><RefreshCw style={{ transform: `rotate(${value * 3.6}deg)` }} /><strong>{modern ? 'CLOUD-READY' : 'TIGHTLY COUPLED'}</strong><span>{modern ? 'Reversible slices' : 'Shared runtime'}</span></div><div className={modern ? 'arch-side target' : 'arch-side target faded'}><span>AFTER</span>{[['Container Apps', Cloud], ['Modern .NET', Braces], ['REST + Service Bus', Network], ['Blob Storage', Database], ['GitHub Actions', GitBranch]].map(([name, Icon]) => { const TypedIcon = Icon as typeof Cloud; return <div key={String(name)}><TypedIcon />{name as string}</div> })}</div></div><div className="morph-summary"><p><span>Readiness</span><strong>{Math.round(42 + value * .49)} / 100</strong></p><p><span>Windows dependencies</span><strong>{Math.max(0, 12 - Math.round(value * .12))}</strong></p><p><span>Deployments / month</span><strong>{Math.max(1, Math.round(value * .1))}+</strong></p><small>Projected demo outcomes · not measured customer benefits</small></div></div>
-    <button className="primary-action stage-action" onClick={onNext}>ZOOM OUT TO THE ESTATE <ArrowRight /></button>
-  </section>
+function TimeScene({ value, onChange, onNext }: { value: number; onChange: (value: number) => void; onNext: () => void }) {
+  const transitions = [
+    ['Windows Server', 'Azure Container Apps', Server, Cloud],
+    ['.NET Framework 4.8', 'Modern .NET', Braces, Braces],
+    ['MSMQ', 'Azure Service Bus', Network, Network],
+    ['Local file system', 'Azure Blob Storage', FileText, Database],
+    ['Manual deployment', 'GitHub Actions', Users, GitBranch],
+  ]
+  return <SceneFrame number="06" eyebrow="MODERNISATION TIME MACHINE" title="Drag the architecture through the change." summary="At each point the diagram shows a credible transition state, not a fictional big-bang rewrite." ghcp="Produces the code, tests, containers and deployment assets for each bounded slice." copilotwith="Sequences those slices into a reversible journey with evidence at every gate.">
+    <div className="time-workspace"><header><span>LEGACY APPLICATION</span><strong>{value}% MODERNISED</strong><span>CLOUD-READY PRODUCT</span></header><input aria-label="Modernisation progress" type="range" min="0" max="100" value={value} onChange={(event) => onChange(Number(event.target.value))} /><div className="transition-grid">{transitions.map(([before, after, BeforeIcon, AfterIcon], index) => { const LeftIcon = BeforeIcon as typeof Server; const RightIcon = AfterIcon as typeof Cloud; const switched = value > 15 + index * 17; return <div key={String(before)} className={switched ? 'switched' : ''}><span><LeftIcon />{before as string}</span><i><ArrowRight /></i><span><RightIcon />{after as string}</span></div> })}</div><div className="architecture-stage"><div className="legacy-stack" style={{ opacity: Math.max(.12, 1 - value / 100) }}><Server /><b>CONTOSO UNIVERSITY</b><span>Coupled Windows application</span></div><div className="transformation-energy"><Sparkles /><strong>{value < 35 ? 'DISCOVERING' : value < 70 ? 'TRANSFORMING' : 'CLOUD-READY'}</strong></div><div className="modern-stack" style={{ opacity: Math.max(.12, value / 100) }}><Cloud /><b>MODERN PRODUCT</b><span>Containerised services on Azure</span></div></div><button className="main-action time-next" onClick={onNext}>THAT IS ONE APP. WHAT ABOUT 300? <ArrowRight /></button></div>
+  </SceneFrame>
 }
 
-function PortfolioScreen({ generated, onGenerate, onRestart }: { generated: boolean; onGenerate: () => void; onRestart: () => void }) {
-  return <section className="control-screen portfolio-screen">
-    <ScreenHeader step="08 // PROGRAMME SCALE" title="One application becomes an operating model." copy="Copilot accelerates engineering. CopilotWith industrialises it across the application estate." agent="PROGRAMME ORCHESTRATOR" />
-    <div className="portfolio-layout"><div className="estate-chart"><div className="axis y">BUSINESS CRITICALITY</div><div className="axis x">MODERNISATION COMPLEXITY</div>{portfolioApps.map((app) => <span key={app.id} className={generated ? `portfolio-app wave-${app.wave} arranged` : 'portfolio-app'} style={generated ? { left: `${12 + (app.wave - 1) * 24}%`, top: `${12 + (app.id % 8) * 10}%`, width: app.size, height: app.size } : { left: `${app.x}%`, top: `${app.y}%`, width: app.size, height: app.size }} title={`Application ${app.id}`} />)}<div className="estate-legend"><span><i /> READY</span><span><i /> REVIEW</span><span><i /> COMPLEX</span></div></div><aside className="portfolio-command"><span>APPLICATION ESTATE</span><h2>127 applications</h2><div className="portfolio-stats"><p><strong>32</strong><span>assessed</span></p><p><strong>11</strong><span>high-risk</span></p><p><strong>8</strong><span>Wave 1 candidates</span></p></div>{generated ? <div className="wave-list">{[['WAVE 1', '8 apps', 'Quick wins'], ['WAVE 2', '14 apps', 'Moderate refactoring'], ['WAVE 3', '7 apps', 'Architecture transformation'], ['WAVE 4', '3 apps', 'Dependency constrained']].map(([wave, count, label]) => <div key={wave}><span>{wave}</span><strong>{count}</strong><small>{label}</small></div>)}</div> : <button className="primary-action" onClick={onGenerate}><Sparkles /> GENERATE MODERNISATION WAVES</button>}</aside></div>
-    {generated && <div className="programme-reveal"><div><span>WHAT JUST HAPPENED?</span><h2>GitHub Copilot powered the engineering. CopilotWith governed the programme.</h2><p>Specialists discovered, planned, transformed, tested, secured, and prepared deployment evidence. Humans owned scope, architecture, risk, review, and progression.</p></div><div className="programme-lanes"><span>CUSTOMER <b>Priorities · constraints · approvals</b></span><span>COPILOTWITH <b>Governance · patterns · orchestration</b></span><span>GITHUB COPILOT <b>Analysis · transformation · validation</b></span><span>AZURE <b>Target platform · deployment · operations</b></span></div><button className="secondary-action" onClick={onRestart}>REPLAY MISSION <RefreshCw /></button></div>}
-  </section>
+function ScaleScene({ waves, persona, onGenerate, onRestart }: { waves: boolean; persona: Persona; onGenerate: () => void; onRestart: () => void }) {
+  const apps = Array.from({ length: 72 }, (_, index) => ({ id: index, x: 5 + ((index * 37) % 89), y: 7 + ((index * 53) % 80), wave: index < 16 ? 1 : index < 39 ? 2 : index < 59 ? 3 : 4 }))
+  return <SceneFrame number="07" eyebrow="FROM ONE APPLICATION TO AN ESTATE" title="This is where Copilot becomes a modernisation programme." summary="The same evidence, patterns, specialists and human gates can organise 5, 50 or 500 applications into executable waves." ghcp="Provides the analysis and engineering capacity across the software lifecycle." copilotwith="Standardises the method, allocates specialists and governs portfolio-scale progression.">
+    <div className="scale-workspace"><div className="estate-map"><span className="axis-y">BUSINESS CRITICALITY</span><span className="axis-x">MODERNISATION COMPLEXITY</span>{apps.map((app) => <i key={app.id} className={waves ? `app-dot wave-${app.wave}` : 'app-dot'} style={waves ? { left: `${8 + (app.wave - 1) * 24}%`, top: `${9 + (app.id % 16) * 5.25}%` } : { left: `${app.x}%`, top: `${app.y}%` }} />)}{waves && <div className="wave-headings"><span>WAVE 1<small>QUICK WINS</small></span><span>WAVE 2<small>MODERATE</small></span><span>WAVE 3<small>TRANSFORM</small></span><span>WAVE 4<small>COMPLEX</small></span></div>}</div><aside className="estate-panel"><span>APPLICATION ESTATE · {persona.toUpperCase()} VIEW</span><h2>127 applications</h2><div className="estate-stats"><p><strong>32</strong><span>assessed</span></p><p><strong>11</strong><span>high risk</span></p><p><strong>23</strong><span>Wave 1 candidates</span></p></div>{waves ? <div className="capacity"><small>AI + HUMAN CAPACITY</small><span><Bot /> 8 application agents</span><span><Cloud /> 3 architecture agents</span><span><ShieldCheck /> 2 security agents</span><span><Users /> 5 human reviewers</span></div> : <button className="generate-waves" onClick={onGenerate}><Sparkles /> GENERATE MODERNISATION WAVES</button>}</aside></div>
+    {waves && <div className="final-reveal"><div><span>WHAT JUST HAPPENED?</span><h2>Copilot gives engineers superpowers. CopilotWith industrialises those superpowers across the application estate.</h2></div><div className="operating-model"><span>CUSTOMER <b>Priorities · constraints · approvals</b></span><span>COPILOTWITH <b>Method · governance · orchestration</b></span><span>GITHUB COPILOT <b>Assess · plan · transform · validate</b></span><span>AZURE <b>Target · deploy · operate</b></span></div><button onClick={onRestart}>REPLAY THE MISSION <RefreshCw /></button></div>}
+  </SceneFrame>
 }
 
-function ScreenHeader({ step, title, copy, agent }: { step: string; title: string; copy: string; agent: string }) {
-  return <header className="screen-header"><div><span className="eyebrow">{step}</span><h1>{title}</h1><p>{copy}</p></div><div className="active-agent"><span className="live-dot" /><Bot /><div><small>ACTIVE AGENT</small><strong>{agent}</strong></div></div></header>
+function SceneFrame({ number, eyebrow, title, summary, ghcp, copilotwith, children }: { number: string; eyebrow: string; title: string; summary: string; ghcp: string; copilotwith: string; children: React.ReactNode }) {
+  return <section className="scene-frame scene-enter"><header className="scene-heading"><span className="scene-number">{number}</span><div><small>{eyebrow}</small><h1>{title}</h1><p>{summary}</p></div></header>{children}<div className="explanation-rail"><div><Bot /><span><small>WHAT GITHUB COPILOT DOES</small>{ghcp}</span></div><div><Radar /><span><small>WHAT COPILOTWITH ADDS</small>{copilotwith}</span></div></div></section>
+}
+
+function EvidenceDrawer({ onClose, transformed, validated }: { onClose: () => void; transformed: boolean; validated: boolean }) {
+  const rows = [
+    ['Application assessment', '23 dependencies · 4 blockers', 'AVAILABLE'],
+    ['Modernisation plan', '5 sequenced tasks · revision 04', 'AVAILABLE'],
+    ['Files changed', transformed ? '14 files · +228 / -163' : 'Not executed', transformed ? 'AVAILABLE' : 'PENDING'],
+    ['Build and tests', validated ? 'Build green · 47/47 tests' : 'Awaiting validation', validated ? 'AVAILABLE' : 'PENDING'],
+    ['Security review', validated ? '2 findings resolved' : 'Awaiting validation', validated ? 'AVAILABLE' : 'PENDING'],
+    ['Pull request', validated ? 'PR #47 · ADR · rollback' : 'Not generated', validated ? 'AVAILABLE' : 'PENDING'],
+    ['Deployment', 'Human approval required', 'CONTROLLED'],
+  ]
+  return <div className="drawer-backdrop" role="presentation" onClick={onClose}><aside className="evidence-drawer" role="dialog" aria-modal="true" aria-label="Mission evidence" onKeyDown={(event) => { if (event.key === 'Escape') onClose() }} onClick={(event) => event.stopPropagation()}><header><div><ShieldCheck /><span><small>MISSION EVIDENCE</small><strong>Every claim has a receipt.</strong></span></div><button autoFocus onClick={onClose} aria-label="Close evidence"><X /></button></header><p>This is an illustrative replay. A connected mission would retain source citations, producing agent, timestamp, confidence and reviewer.</p><div className="evidence-rows">{rows.map(([name, detail, status]) => <div key={name}><FileText /><span><strong>{name}</strong><small>{detail}</small></span><b className={status.toLowerCase()}>{status}</b></div>)}</div><footer><LockKeyhole /><span>Agents produce evidence. People own consequential decisions.</span></footer></aside></div>
 }
 
 export default MissionControl

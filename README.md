@@ -10,16 +10,16 @@ This is an application-like control room, not a CopilotWith information site.
 
 ## The mission
 
-1. Select the repository-grounded PolicyHub sample.
-2. Watch its application X-Ray reveal four modernisation blockers.
-3. Inspect the specialist agent fleet and evidence handoffs.
-4. Change priorities, target platform, and programme constraints.
-5. Approve a bounded pricing-service transformation.
-6. Review code, build, test, security, container, and pull-request evidence.
-7. Drag the architecture from legacy to modern.
-8. Generate modernisation waves for a 127-application illustrative estate.
+1. Enter the Contoso University modernisation mission.
+2. Watch an application X-Ray reveal runtime, messaging, storage, and hosting blockers.
+3. Ask questions that refocus the topology and affected modernisation path.
+4. Inspect eight specialist agents and watch evidence move through their handoffs.
+5. Change priorities and customer constraints, then approve a bounded plan.
+6. Transform an MSMQ publisher into an Azure Service Bus integration.
+7. Review build, test, security, container, pull-request, and human-gate evidence.
+8. Drag the architecture through its transition and generate portfolio waves.
 
-Three persona controls change the emphasis for executives, architects, and engineers. Story Mode is deterministic and safe for live demonstrations.
+Three persona controls change the estate emphasis for executives, architects, and developers. The guided demo is deterministic and safe for live demonstrations.
 
 ## Run locally
 
@@ -49,6 +49,6 @@ docs/                  Architecture, demo script, and provenance
 
 ## Demo boundary
 
-The current build is a deterministic replay, not a live repository scanner. PolicyHub facts are adapted from the CopilotWith Contoso Insurance sample outputs. Generated code, validation outcomes, projected readiness, and portfolio metrics are illustrative and labelled accordingly.
+The current build is a deterministic replay, not a live repository scanner. Contoso University, its topology, generated code, validation outcomes, projected readiness, and portfolio metrics are illustrative and labelled accordingly. The specialist roles, evidence discipline, human gates, and governance boundaries reflect the CopilotWith operating model.
 
 See [data provenance](docs/DATA-PROVENANCE.md), [architecture](docs/ARCHITECTURE.md), and the [customer demo script](docs/DEMO-SCRIPT.md).
