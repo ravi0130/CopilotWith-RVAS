@@ -1,6 +1,6 @@
 # CopilotWith Modernisation Mission Control
 
-An interactive customer accelerator that makes application modernisation feel like a live, governed engineering mission. It automatically moves from a multi-technology launch bay into an Application X-Ray and a working agent operations room, then stops at the first consequential human decision.
+An interactive customer accelerator that makes application modernisation feel like a live, governed engineering mission. It moves from a multi-technology launch bay through the CopilotWith operating model and specialist pack atlas, then into an Application X-Ray and working agent operations room before stopping at the first consequential human decision.
 
 This is an application-like control room, not a CopilotWith information site.
 
@@ -11,13 +11,13 @@ This is an application-like control room, not a CopilotWith information site.
 ## The mission
 
 1. Watch .NET, COBOL, Progress, Uniface, Liferay, middleware, HDInsight, and Azure DevOps estates route to specialist packs.
-2. Let the mission self-launch and stream explainable Application X-Ray evidence.
-3. Watch repository-grounded agents activate, expose their powers and tools, and hand evidence forward.
-4. Inspect the 127-definition CopilotWith agent library across specialist packs.
-5. Change priorities and customer constraints, then approve a bounded plan.
-6. Transform an MSMQ publisher into an Azure Service Bus integration.
-7. Review build, test, security, container, pull-request, and human-gate evidence.
-8. Drag the architecture through its transition and generate portfolio waves.
+2. See Estate Intelligence and Governed Execution operate as one evidence-led loop.
+3. Explore 11 specialist routes with their agents, skills, method, inputs, outputs, maturity, and guardrails.
+4. Let the mission stream explainable Application X-Ray evidence and activate repository-grounded agents.
+5. Inspect the 127-definition CopilotWith agent library and live handoffs.
+6. Change priorities and customer constraints, then approve a bounded plan.
+7. Transform an MSMQ publisher and review build, test, security, container, and pull-request evidence.
+8. Generate portfolio waves and explore the five-level controlled adoption model.
 
 Autoplay handles the first act without presenter input and deliberately stops at architecture approval. Three persona controls change the estate emphasis for executives, architects, and developers.
 

@@ -9,11 +9,13 @@ import {
 import './MissionControl.css'
 
 type Persona = 'Executive' | 'Architect' | 'Developer'
-type Scene = 'brief' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
+type Scene = 'brief' | 'framework' | 'packs' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
 type AgentId = 'archaeologist' | 'dependency' | 'planner' | 'architect' | 'integration' | 'security' | 'test' | 'deployment'
 
 const scenes: Array<{ id: Scene; label: string; verb: string }> = [
   { id: 'brief', label: 'Mission', verb: 'ENTER' },
+  { id: 'framework', label: 'Operating Model', verb: 'GOVERN' },
+  { id: 'packs', label: 'Pack Atlas', verb: 'ROUTE' },
   { id: 'xray', label: 'Application X-Ray', verb: 'DISCOVER' },
   { id: 'fleet', label: 'Agent Team', verb: 'ORCHESTRATE' },
   { id: 'plan', label: 'Modernisation Plan', verb: 'DECIDE' },
@@ -60,6 +62,20 @@ const packInventory = [
   ['DATA & ANALYTICS', '30+ agents'], ['DELIVERY & CHANGE', '10+ agents'],
 ]
 
+const packCatalog = [
+  { id: 'modernisation', name: 'Application Modernisation', code: '01', category: 'SOURCE AVAILABLE', maturity: 'DEMONSTRATED PATTERN', agents: '11 agents', skills: '19 skills', scenario: '.NET and open-source codebases', layer1: 'System discovery · architecture reasoning · behaviour contract · domain boundaries', layer2: 'Refactor, modular-monolith or microservices plan · tests · bounded implementation', sources: '.NET Framework · VB.NET · VB6 · ASP · Java · Delphi · PowerBuilder · ColdFusion', outputs: 'HLD / LLD · ADRs · user stories · tests · pull requests · business case', sequence: ['DISCOVER', 'DOCUMENT', 'CONTRACT', 'DOMAIN', 'STRATEGY', 'PLAN', 'TEST', 'IMPLEMENT'], guardrail: 'Tests before material change. Human review at every stage.', icon: Braces },
+  { id: 'blazor', name: 'Blazor Estate Analysis', code: '10', category: 'CALIBRATION LAB', maturity: 'BLIND-SANITY TESTED', agents: 'Analysis pipeline', skills: '7 specialist skills', scenario: 'MVC + Razor Pages to Blazor', layer1: 'Detect hybrid estates, auth contracts, session state, JavaScript coupling and pilot candidates', layer2: 'Wave planning after the analysis gate; transformation is deliberately excluded from calibration', sources: 'Controllers · Razor views · claims · Session · TempData · jQuery · EF Core', outputs: 'Architecture summary · feature scoring · risk register · pilot recommendation', sequence: ['SCAN', 'SCORE', 'CONTRACT', 'COUPLING', 'PILOT', 'GATE'], guardrail: 'A faithful run must preserve five governance-critical findings.', icon: Layers3 },
+  { id: 'cobol', name: 'COBOL Modernisation', code: '11', category: 'SPECIALIST ADVANCED', maturity: 'DESIGNED + WORKED SAMPLE', agents: '9 agents', skills: '2 deep skills', scenario: 'Batch, CICS, JCL, VSAM and DB2', layer1: 'Estate census · paragraph-level analysis · copybook model · rules · batch flow', layer2: 'Azure target · characterisation tests · governed COBOL to .NET / Java conversion', sources: 'COBOL · copybooks · JCL · COMMAREA · VSAM · DB2', outputs: 'Call graph · schema · rule catalogue · test harness · target design', sequence: ['CENSUS', 'DEEP ANALYSIS', 'DATA', 'RULES', 'FLOWS', 'DESIGN', 'TEST', 'CONVERT', 'GATE'], guardrail: 'Executable code is authoritative. Every claim cites program and line.', icon: Server },
+  { id: 'progress', name: 'Progress OpenEdge', code: '12', category: 'SPECIALIST ADVANCED', maturity: 'DESIGNED + WORKED SAMPLE', agents: '9 agents', skills: '2 deep skills', scenario: 'ABL / 4GL configured estates', layer1: 'Resolve PROPATH, preprocessor, includes, triggers, dynamic RUN and shared state', layer2: 'Target design · parity tests · governed Progress to .NET / Java conversion', sources: '.p · .w · .i · .cls · .df · .pf · compile listings', outputs: 'Compile view · call graph · hidden dependencies · schema · rule catalogue', sequence: ['CENSUS', 'RESOLVE', 'ANALYSE', 'DATA', 'RULES', 'FLOWS', 'DESIGN', 'TEST', 'GATE'], guardrail: 'Analyse the resolved compile view, never the first matching source file.', icon: Database },
+  { id: 'uniface', name: 'Uniface Modernisation', code: '13', category: 'SPECIALIST ADVANCED', maturity: 'DESIGNED + WORKED SAMPLE', agents: '9 agents', skills: '2 deep skills', scenario: 'Model-driven 4GL estates', layer1: 'Resolve model layers, trigger inheritance, signatures, operations and runtime wiring', layer2: 'Azure target · operation-parity tests · governed Uniface to .NET / Java conversion', sources: '.urr · .uar · .asn · DB schema · ProcScript · 3GL bridges', outputs: 'Resolved behaviour · entity model · rules · flows · security map · target design', sequence: ['CENSUS', 'TRIGGERS', 'DATA', 'RULES', 'FLOWS', 'DESIGN', 'TEST', 'CONVERT', 'GATE'], guardrail: 'An empty trigger is a finding. Compilation state and inheritance matter.', icon: FileCode2 },
+  { id: 'middleware', name: 'Middleware Displacement', code: '21', category: 'FACTORY PACK', maturity: 'PROVEN IN ENGAGEMENT', agents: '12 agents', skills: '20+ skills', scenario: 'MQ, ACE, MuleSoft, Tibco, BizTalk, Boomi, Apigee', layer1: 'Estate census · deep analysis · contracts · runtime flows · transformation logic', layer2: 'Azure Integration Services design · implementation · testing · security · cutover', sources: 'Flows · ESQL · APIs · queues · EDI · runtime evidence · configuration', outputs: 'Interface register · OpenAPI / AsyncAPI · mappings · evidence pack · cutover plan', sequence: ['CENSUS', 'ANALYSE', 'CONTRACT', 'FLOW', 'DESIGN', 'BUILD', 'TEST', 'SECURE', 'CUTOVER', 'GATE'], guardrail: 'Skill-first analysis and a ten-section evidence record per integration.', icon: Network },
+  { id: 'liferay', name: 'Liferay Modernisation', code: '30', category: 'SCOPING PACK', maturity: 'DESIGNED CAPABILITY', agents: '2 agents', skills: '6 skills', scenario: 'Liferay Portal / DXP estates', layer1: 'Discover forms, Objects, workflows, OSGi modules and headless API surfaces', layer2: 'Design two-track plan: portable forms first, custom Java modules second', sources: 'DDM · Objects · content · workflows · OSGi · Service Builder · portlets', outputs: 'Inventory · open questions · authoring ADR · framework ADR · wave-one plan', sequence: ['DISCOVER', 'CLASSIFY', 'ADR', 'TRACK A', 'TRACK B', 'BRIEF'], guardrail: 'Scoping only. Delivery-tier transforms and cutover are separate.', icon: Layers3 },
+  { id: 'reverse', name: 'Reverse Engineering', code: '80', category: 'COTS / PARTIAL SOURCE', maturity: 'DESIGNED CAPABILITY', agents: '19 agents', skills: 'Evidence-led', scenario: 'Closed-source or incomplete systems', layer1: 'Evidence census · capabilities · process · data · rules · UX · integrations · reports', layer2: 'Target design · backlog · implementation · testing · security · governance', sources: 'Metadata · configuration · APIs · database schema · runtime evidence · SME input', outputs: 'Reconstructed contracts · feature inventory · risks · target design · backlog', sequence: ['TRIAGE', 'EXTRACT', 'RECONSTRUCT', 'VALIDATE', 'DESIGN', 'BUILD', 'PROVE', 'GATE'], guardrail: 'Unknowns remain unknown. Effectiveness depends on available evidence.', icon: Search },
+  { id: 'data-estate', name: 'Data Estate Discovery', code: 'DATA', category: 'ESTATE INTELLIGENCE', maturity: 'DESIGNED CAPABILITY', agents: '13 agents', skills: 'Two gated phases', scenario: 'Structured enterprise data estates', layer1: 'Document census · metadata harvest · classification · semantic matching · lineage', layer2: 'Catalogue · platform fit · data products · implementation · security governance', sources: 'Databases · schemas · apps · integration surfaces · managed data platforms', outputs: 'Catalogue · lineage · classifications · platform recommendations · product designs', sequence: ['INTAKE', 'HARVEST', 'CLASSIFY', 'MATCH', 'LINEAGE', 'GATE', 'DESIGN'], guardrail: 'Read-only harvest followed by a human governance gate.', icon: Database },
+  { id: 'data-sprawl', name: 'Data Sprawl Discovery', code: '63', category: 'ESTATE INTELLIGENCE', maturity: 'DESIGNED CAPABILITY', agents: '8 agents', skills: 'Local discovery scripts', scenario: 'Uncontrolled file-based data', layer1: 'Connector planning · metadata discovery · risk · duplication · governance readiness', layer2: 'Strategy · remediation backlog · executive output', sources: 'SharePoint · OneDrive · Teams · network shares · local exports', outputs: 'Sprawl census · duplicate themes · risk register · remediation priorities', sequence: ['INTAKE', 'CONNECT', 'DISCOVER', 'RISK', 'DEDUP', 'SCORE', 'STRATEGY', 'BRIEF'], guardrail: 'Metadata-first discovery; source content and customer boundaries remain controlled.', icon: FileText },
+  { id: 'integration', name: 'Integration Modernisation', code: '93', category: 'CALIBRATION LAB', maturity: 'BLIND-SANITY TESTED', agents: 'Discovery pipeline', skills: '4 domain skills', scenario: 'Document-led integration estates', layer1: 'Diff documents against SME corrections, preserve opacity and surface consolidation', layer2: 'Design and implementation remain behind a separate stage gate', sources: 'Discovery documents · workshop emails · contracts · operator constraints', outputs: 'Catalogue · readiness · open questions · consolidation · Wave 1 recommendation', sequence: ['PARSE', 'DIFF', 'CATALOGUE', 'CLASSIFY', 'QUESTION', 'CONSOLIDATE', 'PILOT'], guardrail: 'Never invent mechanisms for undocumented feeds or opaque vendor paths.', icon: GitBranch },
+]
+
 const blockers = [
   { id: 'runtime', label: '.NET Framework 4.8', detail: 'Windows-only runtime', target: 'Modern .NET', risk: 'HIGH', icon: Braces, x: 50, y: 15 },
   { id: 'queue', label: 'MSMQ', detail: '3 dependent components', target: 'Azure Service Bus', risk: 'CRITICAL', icon: Network, x: 18, y: 46 },
@@ -78,6 +94,13 @@ const handoffs = [
 
 const planOptions = ['Lowest risk', 'Fastest migration', 'Cloud-native', 'Minimal code change']
 const constraints = ['Database unchanged', 'Zero downtime', 'No public endpoints', 'Remain hybrid', 'One component only']
+const adoptionLevels = [
+  ['01', 'ASSISTED ANALYSIS', 'Copilot helps an engineer inspect one system.'],
+  ['02', 'SKILL-DRIVEN WORKFLOW', 'Reusable methods, evidence templates and explicit gates.'],
+  ['03', 'SPECIALIST AGENTS', 'Named agents own bounded tasks and hand work forward.'],
+  ['04', 'MULTI-AGENT DELIVERY', 'Maker, checker and governance roles coordinate at scale.'],
+  ['05', 'PORTFOLIO OPERATING MODEL', 'Patterns, controls and evidence govern the whole estate.'],
+]
 
 function MissionControl() {
   const [scene, setScene] = useState<Scene>('brief')
@@ -97,6 +120,8 @@ function MissionControl() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [autoDemo, setAutoDemo] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [applicationIndex, setApplicationIndex] = useState(0)
+  const [packIndex, setPackIndex] = useState(0)
+  const [adoptionLevel, setAdoptionLevel] = useState(2)
 
   const sceneIndex = scenes.findIndex((item) => item.id === scene)
 
@@ -125,10 +150,30 @@ function MissionControl() {
     if (!autoDemo || scene !== 'brief') return
     const carousel = window.setInterval(() => setApplicationIndex((value) => (value + 1) % applicationTypes.length), 1200)
     const launch = window.setTimeout(() => {
+      setScene('framework')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 7600)
+    return () => { clearInterval(carousel); clearTimeout(launch) }
+  }, [autoDemo, scene])
+
+  useEffect(() => {
+    if (!autoDemo || scene !== 'framework') return
+    const timer = window.setTimeout(() => {
+      setScene('packs')
+      setPackIndex(0)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 8400)
+    return () => clearTimeout(timer)
+  }, [autoDemo, scene])
+
+  useEffect(() => {
+    if (!autoDemo || scene !== 'packs') return
+    const carousel = window.setInterval(() => setPackIndex((value) => (value + 1) % packCatalog.length), 1050)
+    const launch = window.setTimeout(() => {
       setScene('xray')
       setScan(1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    }, 7600)
+    }, 12600)
     return () => { clearInterval(carousel); clearTimeout(launch) }
   }, [autoDemo, scene])
 
@@ -163,6 +208,7 @@ function MissionControl() {
 
   const next = () => sceneIndex < scenes.length - 1 && go(scenes[sceneIndex + 1].id)
   const previous = () => sceneIndex > 0 && go(scenes[sceneIndex - 1].id)
+  const activeStatus = scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : scene === 'framework' ? 'TWO-LAYER GOVERNED OPERATING MODEL' : scene === 'packs' ? packCatalog[packIndex].name.toUpperCase() : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'
 
   return <div className="mc-shell">
     <header className="mc-topbar">
@@ -180,20 +226,22 @@ function MissionControl() {
 
     <div className="mc-statusbar">
       <span><i /> {autoDemo ? 'AUTONOMOUS DEMO RUNNING' : 'PRESENTER CONTROL'}</span>
-      <span className="app-status"><b>ACTIVE APPLICATION</b> {scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'}</span>
+      <span className="app-status"><b>{scene === 'packs' ? 'ACTIVE PACK' : 'ACTIVE MISSION'}</b> {activeStatus}</span>
       <button className="autoplay-toggle" onClick={() => setAutoDemo((value) => !value)}>{autoDemo ? <Pause /> : <Play />} {autoDemo ? 'PAUSE' : 'AUTOPLAY'}</button>
       <div className="persona-switch"><small>VIEW AS</small>{(['Executive', 'Architect', 'Developer'] as Persona[]).map((item) => <button key={item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>{item}</button>)}</div>
     </div>
 
     <main className="mc-main">
-      {scene === 'brief' && <BriefScene selected={applicationIndex} onSelect={setApplicationIndex} onStart={() => { setAutoDemo(true); go('xray') }} />}
+      {scene === 'brief' && <BriefScene selected={applicationIndex} onSelect={setApplicationIndex} onStart={() => { setAutoDemo(true); go('framework') }} />}
+      {scene === 'framework' && <FrameworkScene onNext={next} />}
+      {scene === 'packs' && <PackAtlasScene selected={packIndex} onSelect={setPackIndex} onNext={next} />}
       {scene === 'xray' && <XrayScene scan={scan} focus={focus} onFocus={setFocus} onNext={next} />}
       {scene === 'fleet' && <FleetScene selected={agent} onSelect={setAgent} handoffStep={handoffStep} onReplay={() => setHandoffStep(0)} onNext={next} />}
       {scene === 'plan' && <PlanScene priority={priority} constraint={constraint} approved={approved} onPriority={(value) => { setPriority(value); setApproved(false) }} onConstraint={(value) => { setConstraint(value); setApproved(false) }} onApprove={() => setApproved(true)} onNext={next} />}
       {scene === 'transform' && <TransformScene transformed={transformed} onTransform={() => setTransformed(true)} onNext={next} />}
       {scene === 'validate' && <ValidateScene validated={validated} onValidate={() => setValidated(true)} onNext={next} />}
       {scene === 'time' && <TimeScene value={modernity} onChange={setModernity} onNext={next} />}
-      {scene === 'scale' && <ScaleScene waves={waves} persona={persona} onGenerate={() => setWaves(true)} onRestart={() => go('brief')} />}
+      {scene === 'scale' && <ScaleScene waves={waves} persona={persona} adoptionLevel={adoptionLevel} onAdoptionLevel={setAdoptionLevel} onGenerate={() => setWaves(true)} onRestart={() => go('brief')} />}
     </main>
 
     {scene !== 'brief' && <footer className="mission-footer">
@@ -234,6 +282,66 @@ function BriefScene({ selected, onSelect, onStart }: { selected: number; onSelec
     <div className="application-launch-bay"><header><span>WHAT CAN COPILOTWITH MODERNISE?</span><b>AUTOMATICALLY ROUTING TO THE RIGHT AGENT PACK</b></header><div>{applicationTypes.map((item, index) => { const Icon = item.icon; return <button key={item.name} className={selected === index ? 'active' : ''} onClick={() => onSelect(index)}><Icon /><span><strong>{item.name}</strong><small>{item.example}</small></span><em>{item.pack}</em></button> })}</div></div>
     <div className="promise-strip"><div><Bot /><span><small>GITHUB COPILOT</small>Analysis · planning · transformation · testing</span></div><ArrowRight /><div><Radar /><span><small>COPILOTWITH</small>Specialists · governance · evidence · programme scale</span></div><ArrowRight /><div><Cloud /><span><small>AZURE</small>Target architecture · deployment · operations</span></div></div>
   </section>
+}
+
+function FrameworkScene({ onNext }: { onNext: () => void }) {
+  const evidence = [
+    ['OBSERVED', 'Source, metadata, runtime'],
+    ['INFERRED', 'Reasoned from evidence'],
+    ['ASSUMED', 'Explicitly unverified'],
+    ['SME-CONFIRMED', 'Validated by a person'],
+  ]
+  return <SceneFrame number="01" eyebrow="THE COPILOTWITH OPERATING MODEL" title="One governed loop. Two equally important layers." summary="First understand the estate without inventing certainty. Then modernise approved candidates through bounded, reviewable change." ghcp="Provides the reasoning and engineering engine that agents use to analyse, plan, change and test." copilotwith="Provides the specialist roles, evidence model, handoffs, controls and human accountability around that engine.">
+    <div className="framework-theatre">
+      <div className="framework-layer intelligence-layer">
+        <header><span>01 · ESTATE INTELLIGENCE</span><b>READ-ONLY</b></header>
+        <Search /><h2>Know what exists</h2><p>Discover systems, dependencies, business capabilities, risk, duplication and missing evidence across the estate.</p>
+        <div className="framework-flow"><span>DISCOVER</span><ArrowRight /><span>CLASSIFY</span><ArrowRight /><span>CONNECT</span><ArrowRight /><span>PRIORITISE</span></div>
+        <small>OUTPUT · EVIDENCE-BASED CANDIDATE PORTFOLIO</small>
+      </div>
+      <div className="evidence-reactor">
+        <Radar /><span className="reactor-pulse" />
+        <small>GOVERNANCE CORE</small><strong>EVIDENCE, NOT GUESSWORK</strong>
+        <div>{evidence.map(([state, detail], index) => <span key={state} style={{ animationDelay: `${index * 0.45}s` }}><b>{state}</b><small>{detail}</small></span>)}</div>
+        <em><UserCheck /> SME VALIDATION GATE</em>
+      </div>
+      <div className="framework-layer execution-layer">
+        <header><span>02 · GOVERNED EXECUTION</span><b>APPROVED WORKSPACE</b></header>
+        <GitPullRequest /><h2>Change what matters</h2><p>Protect behaviour, choose a strategy, implement small slices and prove each outcome before progression.</p>
+        <div className="framework-flow"><span>CONTRACT</span><ArrowRight /><span>DESIGN</span><ArrowRight /><span>BUILD</span><ArrowRight /><span>PROVE</span></div>
+        <small>OUTPUT · REVIEWABLE PULL REQUESTS + DECISION EVIDENCE</small>
+      </div>
+    </div>
+    <div className="accountability-rail">
+      <div><Users /><span><small>HUMANS OWN</small>Priorities · target direction · architecture · risk · gates · acceptance</span></div>
+      <div><Bot /><span><small>AGENTS CREATE</small>Evidence · options · recommendations · tests · bounded code changes</span></div>
+      <div className="no-autonomy"><LockKeyhole /><span><small>NEVER AUTONOMOUS</small>No merges · no production pushes · no risk acceptance · no invented facts</span></div>
+    </div>
+    <div className="framework-next"><strong>This is not “AI writes code.”</strong><span>It is an accountable engineering system.</span><button className="main-action" onClick={onNext}>OPEN THE SPECIALIST PACK ATLAS <ArrowRight /></button></div>
+  </SceneFrame>
+}
+
+function PackAtlasScene({ selected, onSelect, onNext }: { selected: number; onSelect: (value: number) => void; onNext: () => void }) {
+  const pack = packCatalog[selected]
+  const PackIcon = pack.icon
+  return <SceneFrame number="02" eyebrow="THE SPECIALIST PACK ATLAS" title="The evidence chooses the route. Not a generic prompt." summary="Select any estate type to inspect its agent team, method, evidence inputs, outputs, maturity and non-negotiable boundary." ghcp="Executes the selected pack's specialist analysis and engineering tasks against supplied evidence." copilotwith="Routes the estate to a domain method whose maturity, outputs and limits remain explicit.">
+    <div className="pack-atlas">
+      <nav className="pack-radar" aria-label="Specialist packs">
+        <div className="radar-orbits"><i /><i /><i /><Radar /></div>
+        {packCatalog.map((item, index) => { const Icon = item.icon; return <button key={item.id} className={`${selected === index ? 'selected' : ''} pack-node pn${index}`} onClick={() => onSelect(index)} aria-pressed={selected === index}><span>{item.code}</span><Icon /><b>{item.name}</b><small>{item.category}</small></button> })}
+      </nav>
+      <article className="pack-dossier" aria-live="polite">
+        <header><div className="pack-code"><PackIcon /><span>{pack.code}</span></div><div><small>{pack.category}</small><h2>{pack.name}</h2><p>{pack.scenario}</p></div><b className={`maturity-badge ${pack.maturity.startsWith('PROVEN') ? 'proven' : pack.maturity.startsWith('DEMONSTRATED') || pack.maturity.startsWith('BLIND') ? 'demonstrated' : ''}`}>{pack.maturity}</b></header>
+        <div className="pack-capacity"><span><Bot /><b>{pack.agents}</b><small>SPECIALISTS</small></span><span><Zap /><b>{pack.skills}</b><small>METHOD POWER</small></span></div>
+        <div className="pack-layers"><div><span>01 · ESTATE INTELLIGENCE</span><p>{pack.layer1}</p></div><ArrowRight /><div><span>02 · GOVERNED EXECUTION</span><p>{pack.layer2}</p></div></div>
+        <div className="pack-method">{pack.sequence.map((step, index) => <span key={step}><b>{String(index + 1).padStart(2, '0')}</b>{step}</span>)}</div>
+        <dl><div><dt>EVIDENCE INPUTS</dt><dd>{pack.sources}</dd></div><div><dt>DELIVERY OUTPUTS</dt><dd>{pack.outputs}</dd></div></dl>
+        <footer><ShieldCheck /><span><small>NON-NEGOTIABLE GUARDRAIL</small>{pack.guardrail}</span></footer>
+        <button className="main-action pack-next" onClick={onNext}>ROUTE A .NET APPLICATION INTO THE MISSION <ArrowRight /></button>
+      </article>
+    </div>
+    <div className="maturity-legend"><span><i className="proven" /><b>PROVEN IN ENGAGEMENT</b> Used in delivery</span><span><i className="demonstrated" /><b>DEMONSTRATED / CALIBRATED</b> Worked and sanity-tested</span><span><i /><b>DESIGNED CAPABILITY</b> Method defined; validate in context</span></div>
+  </SceneFrame>
 }
 
 function XrayScene({ scan, focus, onFocus, onNext }: { scan: number; focus: string; onFocus: (value: string) => void; onNext: () => void }) {
@@ -335,11 +443,11 @@ function TimeScene({ value, onChange, onNext }: { value: number; onChange: (valu
   </SceneFrame>
 }
 
-function ScaleScene({ waves, persona, onGenerate, onRestart }: { waves: boolean; persona: Persona; onGenerate: () => void; onRestart: () => void }) {
+function ScaleScene({ waves, persona, adoptionLevel, onAdoptionLevel, onGenerate, onRestart }: { waves: boolean; persona: Persona; adoptionLevel: number; onAdoptionLevel: (value: number) => void; onGenerate: () => void; onRestart: () => void }) {
   const apps = Array.from({ length: 72 }, (_, index) => ({ id: index, x: 5 + ((index * 37) % 89), y: 7 + ((index * 53) % 80), wave: index < 16 ? 1 : index < 39 ? 2 : index < 59 ? 3 : 4 }))
   return <SceneFrame number="07" eyebrow="FROM ONE APPLICATION TO AN ESTATE" title="This is where Copilot becomes a modernisation programme." summary="The same evidence, patterns, specialists and human gates can organise 5, 50 or 500 applications into executable waves." ghcp="Provides the analysis and engineering capacity across the software lifecycle." copilotwith="Standardises the method, allocates specialists and governs portfolio-scale progression.">
     <div className="scale-workspace"><div className="estate-map"><span className="axis-y">BUSINESS CRITICALITY</span><span className="axis-x">MODERNISATION COMPLEXITY</span>{apps.map((app) => <i key={app.id} className={waves ? `app-dot wave-${app.wave}` : 'app-dot'} style={waves ? { left: `${8 + (app.wave - 1) * 24}%`, top: `${9 + (app.id % 16) * 5.25}%` } : { left: `${app.x}%`, top: `${app.y}%` }} />)}{waves && <div className="wave-headings"><span>WAVE 1<small>QUICK WINS</small></span><span>WAVE 2<small>MODERATE</small></span><span>WAVE 3<small>TRANSFORM</small></span><span>WAVE 4<small>COMPLEX</small></span></div>}</div><aside className="estate-panel"><span>APPLICATION ESTATE · {persona.toUpperCase()} VIEW</span><h2>127 applications</h2><div className="estate-stats"><p><strong>32</strong><span>assessed</span></p><p><strong>11</strong><span>high risk</span></p><p><strong>23</strong><span>Wave 1 candidates</span></p></div>{waves ? <div className="capacity"><small>AI + HUMAN CAPACITY</small><span><Bot /> 8 application agents</span><span><Cloud /> 3 architecture agents</span><span><ShieldCheck /> 2 security agents</span><span><Users /> 5 human reviewers</span></div> : <button className="generate-waves" onClick={onGenerate}><Sparkles /> GENERATE MODERNISATION WAVES</button>}</aside></div>
-    {waves && <div className="final-reveal"><div><span>WHAT JUST HAPPENED?</span><h2>Copilot gives engineers superpowers. CopilotWith industrialises those superpowers across the application estate.</h2></div><div className="operating-model"><span>CUSTOMER <b>Priorities · constraints · approvals</b></span><span>COPILOTWITH <b>Method · governance · orchestration</b></span><span>GITHUB COPILOT <b>Assess · plan · transform · validate</b></span><span>AZURE <b>Target · deploy · operate</b></span></div><button onClick={onRestart}>REPLAY THE MISSION <RefreshCw /></button></div>}
+    {waves && <><div className="adoption-console"><header><div><span>CONTROLLED ADOPTION</span><strong>Start with trust you can earn.</strong></div><b>RECOMMENDED START · LEVEL 02</b></header><div className="adoption-levels">{adoptionLevels.map(([number, title, detail], index) => <button key={number} className={adoptionLevel === index + 1 ? 'active' : ''} onClick={() => onAdoptionLevel(index + 1)}><span>{number}</span><strong>{title}</strong><small>{detail}</small>{index === 1 && <em>START HERE</em>}</button>)}</div><div className="adoption-boundary"><ShieldCheck /><span><small>CONTROL DOES NOT DISAPPEAR AS CAPABILITY GROWS</small>Every level retains evidence labels, human stage gates, pull-request review and accountable acceptance.</span><div><b>PROVEN</b> Middleware factory</div><div><b>DEMONSTRATED</b> App modernisation</div><div><b>DESIGNED</b> Specialist accelerators</div></div></div><div className="final-reveal"><div><span>WHAT JUST HAPPENED?</span><h2>Copilot gives engineers superpowers. CopilotWith industrialises those superpowers across the application estate.</h2></div><div className="operating-model"><span>CUSTOMER <b>Priorities · constraints · approvals</b></span><span>COPILOTWITH <b>Method · governance · orchestration</b></span><span>GITHUB COPILOT <b>Assess · plan · transform · validate</b></span><span>AZURE <b>Target · deploy · operate</b></span></div><button onClick={onRestart}>REPLAY THE MISSION <RefreshCw /></button></div></>}
   </SceneFrame>
 }
 

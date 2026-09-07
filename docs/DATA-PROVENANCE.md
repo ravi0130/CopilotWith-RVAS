@@ -10,6 +10,15 @@ The CopilotWith repository grounds the specialist-agent model, explicit control 
 
 The launch-bay domains and named specialist patterns are drawn from repository packs. The displayed total of 127 agent definitions is a repository inventory snapshot and should be updated when packs change.
 
+The pack atlas synthesises repository READMEs, AGENTS files, playbooks, samples, and pack manifests. Maturity labels are intentionally non-uniform:
+
+- **Proven in engagement** identifies the middleware displacement factory.
+- **Demonstrated pattern** identifies application modernisation capability exercised through repository examples.
+- **Blind-sanity tested** identifies the Blazor and document-led integration calibration corpora.
+- **Designed capability** or **designed with worked sample** identifies methods that still require validation in the customer context.
+
+The adoption ladder is an operating recommendation, not a maturity score or customer benchmark. Level 2 is presented as the normal starting point because it introduces reusable skills, evidence templates, and explicit gates before multi-agent autonomy expands.
+
 ## Illustrative replay
 
 The following are demo devices rather than measured customer results:

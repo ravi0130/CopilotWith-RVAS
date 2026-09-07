@@ -8,13 +8,25 @@ Do not touch the controls. The launch bay cycles through eight modernisation dom
 
 > Contoso University is an illustrative legacy application. GitHub Copilot supplies the engineering engine; CopilotWith turns that capability into a controlled mission.
 
-## 2. Watch the X-Ray
+## 2. Explain the operating model
+
+The mission enters the two-layer theatre automatically. Point out the evidence reactor and SME gate between Estate Intelligence and Governed Execution.
+
+> This is not “AI writes code.” Agents create evidence, options and bounded changes. Humans own priorities, architecture, risk, gates and acceptance.
+
+## 3. Tour the pack atlas
+
+Let the radar rotate, then select COBOL, middleware, reverse engineering, and data estate discovery. The dossier changes its evidence sources, method, outputs, maturity, and guardrail.
+
+> CopilotWith does not send every estate through a generic prompt. Evidence selects a specialist method, and the UI tells us honestly whether that capability is proven, demonstrated, calibrated, or designed.
+
+## 4. Watch the X-Ray
 
 The topology expands while the side rail streams timestamped, classified evidence. The mission advances automatically when the scan is complete.
 
 > Copilot turns source into a topology. CopilotWith keeps the finding, evidence, risk, target pattern, and accountable specialist connected.
 
-## 3. Follow the agents
+## 5. Follow the agents
 
 Let the active specialist change as the handoff theatre distinguishes `OBSERVED`, `PROPOSED`, `READY`, and `DECISION`. Point out powers, tools, produced artefacts, and the human boundary. The lower rail shows the wider 127-definition library.
 
@@ -22,7 +34,7 @@ Let the active specialist change as the handoff theatre distinguishes `OBSERVED`
 
 Autoplay stops at the next scene. This pause is intentional: architecture, scope, and risk need a person.
 
-## 4. Change the plan
+## 6. Change the plan
 
 Choose **Fastest migration**, add **Zero downtime**, then return to **Lowest risk** and **Database unchanged**.
 
@@ -30,27 +42,27 @@ Choose **Fastest migration**, add **Zero downtime**, then return to **Lowest ris
 
 Approve the plan and begin transformation.
 
-## 5. Transform one component
+## 7. Transform one component
 
 Select **Modernise this component**. Show the MSMQ-to-Azure-Service-Bus diff, compatibility tests, security control, container assets, and build output.
 
 > The unit of progress is a bounded, reviewable change with evidence, not an autonomous rewrite.
 
-## 6. Show the evidence
+## 8. Show the evidence
 
 Run the validation gates. Review the five checks and illustrative PR, then open **Show me the evidence**.
 
 > Agents cannot approve their own work, merge the pull request, accept risk, or push to production.
 
-## 7. Use the time machine
+## 9. Use the time machine
 
 Drag from legacy to modern. Pause at the midpoint to show that transition states are intentional.
 
 > Every future-state node represents accumulated approved slices, not architecture theatre.
 
-## 8. Scale the pattern
+## 10. Scale the pattern
 
-Generate modernisation waves.
+Generate modernisation waves, then select adoption levels 1 through 5. Most teams should begin at Level 2: reusable skills, evidence templates, and explicit gates.
 
 > GitHub Copilot gives engineers superpowers. CopilotWith gives the organisation a way to industrialise those superpowers across an application estate.
 
