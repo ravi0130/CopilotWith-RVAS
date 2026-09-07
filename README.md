@@ -54,4 +54,4 @@ docs/                  Architecture, demo script, and provenance
 
 The current build is a deterministic replay, not a live repository scanner. Demo source facts are grounded in their named repositories or labs; plans, target outcomes, and timed agent activity remain replayed or proposed. The application always distinguishes modern `dotnet/eShop`, the legacy Contoso University migration sample, the Java/AKS PetClinic lab, and the preserved local eShopOnWeb reference replay.
 
-See the [page-by-page storyline](docs/STORYLINE.md), [customer demo script](docs/DEMO-SCRIPT.md), [data provenance](docs/DATA-PROVENANCE.md), and [architecture](docs/ARCHITECTURE.md).
+See the [page-by-page storyline](docs/STORYLINE.docx), [customer demo script](docs/DEMO-SCRIPT.md), [data provenance](docs/DATA-PROVENANCE.md), and [architecture](docs/ARCHITECTURE.md).
