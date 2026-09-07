@@ -32,13 +32,24 @@ The following are demo devices rather than measured customer results:
 
 The UI labels autoplay as an autonomous demo, calls the pull request an illustrative replay, and labels projected outcomes.
 
+## eShopOnWeb source grounding
+
+The Demo Lab is grounded in `01-modernisation/eShopOnWeb` from the CopilotWith repository. Its solution contains six source projects (`Web`, `Infrastructure`, `ApplicationCore`, `PublicApi`, `BlazorAdmin`, and `BlazorShared`) and four test projects (`UnitTests`, `IntegrationTests`, `FunctionalTests`, and `PublicApiIntegrationTests`).
+
+The deployment evidence is also observed: `docker-compose.yml` defines the `eshopwebmvc`, `eshoppublicapi`, and `sqlserver` services; `azure.yaml` maps `./src/Web` to App Service; and the repository contains Bicep infrastructure. The storefront asset at `public/eshoponweb-storefront.png` originates from the Microsoft eShopOnWeb README image used by the source sample.
+
+The Understand, Protect, and Deliver event timing, agent activity, and named outputs are deterministic replay constructs. They are not measured execution results. eShopOnWeb is already an ASP.NET Core 8 reference application; the Demo Lab does not claim that it needs a runtime upgrade.
+
+The nearby `sample-output/eshop-catalogue` material describes an illustrative multi-variant catalogue estate. Its WCF and WebForms risks must never be attributed to the actual eShopOnWeb source.
+
 ## Presenter rules
 
 1. Say "illustrative replay," never "live scan" or "measured customer result."
-2. Do not attribute projected metrics to a customer.
-3. Preserve confidence and decision classifications.
-4. Keep human approval visible and consequential.
-5. Use Connected Mode language only when a real repository adapter is active.
+2. Describe eShopOnWeb structure as source-grounded, while describing its timed agent activity as replayed.
+3. Do not attribute projected metrics to a customer.
+4. Preserve confidence and decision classifications.
+5. Keep human approval visible and consequential.
+6. Use Connected Mode language only when a real repository adapter is active.
 
 ## Customer-data requirements
 

@@ -20,13 +20,21 @@ Let the radar rotate, then select COBOL, middleware, reverse engineering, and da
 
 > CopilotWith does not send every estate through a generic prompt. Evidence selects a specialist method, and the UI tells us honestly whether that capability is proven, demonstrated, calibrated, or designed.
 
-## 4. Watch the X-Ray
+## 4. Run the application demo lab
 
-The topology expands while the side rail streams timestamped, classified evidence. The mission advances automatically when the scan is complete.
+Pause on Microsoft eShopOnWeb. It is a real ASP.NET Core 8 reference application: six source projects, four test projects, two application containers, a SQL service, `azure.yaml`, and Bicep infrastructure.
+
+Select **Understand**, **Protect**, and **Deliver**. Each mission changes the specialist agent, repository evidence, execution stream, and reviewable output.
+
+> The application structure is source-grounded. The timed agent stream is a deterministic replay. eShopOnWeb is already modern; this demonstrates explainability, safety-net analysis, and governed delivery rather than a fictitious runtime upgrade.
+
+## 5. Watch the X-Ray
+
+The story now switches to Contoso University, an illustrative .NET Framework payload with Windows-specific blockers. Its topology expands while the side rail streams timestamped, classified evidence. The mission advances automatically when the scan is complete.
 
 > Copilot turns source into a topology. CopilotWith keeps the finding, evidence, risk, target pattern, and accountable specialist connected.
 
-## 5. Follow the agents
+## 6. Follow the agents
 
 Let the active specialist change as the handoff theatre distinguishes `OBSERVED`, `PROPOSED`, `READY`, and `DECISION`. Point out powers, tools, produced artefacts, and the human boundary. The lower rail shows the wider 127-definition library.
 
@@ -34,7 +42,7 @@ Let the active specialist change as the handoff theatre distinguishes `OBSERVED`
 
 Autoplay stops at the next scene. This pause is intentional: architecture, scope, and risk need a person.
 
-## 6. Change the plan
+## 7. Change the plan
 
 Choose **Fastest migration**, add **Zero downtime**, then return to **Lowest risk** and **Database unchanged**.
 
@@ -42,25 +50,25 @@ Choose **Fastest migration**, add **Zero downtime**, then return to **Lowest ris
 
 Approve the plan and begin transformation.
 
-## 7. Transform one component
+## 8. Transform one component
 
-Select **Modernise this component**. Show the MSMQ-to-Azure-Service-Bus diff, compatibility tests, security control, container assets, and build output.
+Select **Modernise this component** on the illustrative Contoso University payload. Show the MSMQ-to-Azure-Service-Bus diff, compatibility tests, security control, container assets, and build output.
 
 > The unit of progress is a bounded, reviewable change with evidence, not an autonomous rewrite.
 
-## 8. Show the evidence
+## 9. Show the evidence
 
 Run the validation gates. Review the five checks and illustrative PR, then open **Show me the evidence**.
 
 > Agents cannot approve their own work, merge the pull request, accept risk, or push to production.
 
-## 9. Use the time machine
+## 10. Use the time machine
 
 Drag from legacy to modern. Pause at the midpoint to show that transition states are intentional.
 
 > Every future-state node represents accumulated approved slices, not architecture theatre.
 
-## 10. Scale the pattern
+## 11. Scale the pattern
 
 Generate modernisation waves, then select adoption levels 1 through 5. Most teams should begin at Level 2: reusable skills, evidence templates, and explicit gates.
 

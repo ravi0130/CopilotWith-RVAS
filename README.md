@@ -1,6 +1,6 @@
 # CopilotWith Modernisation Mission Control
 
-An interactive customer accelerator that makes application modernisation feel like a live, governed engineering mission. It moves from a multi-technology launch bay through the CopilotWith operating model and specialist pack atlas, then into an Application X-Ray and working agent operations room before stopping at the first consequential human decision.
+An interactive customer accelerator that makes application modernisation feel like a live, governed engineering mission. It moves from a multi-technology launch bay through the CopilotWith operating model and specialist pack atlas, grounds the story in a real eShopOnWeb demo lab, then enters an illustrative legacy Application X-Ray and working agent operations room before stopping at the first consequential human decision.
 
 This is an application-like control room, not a CopilotWith information site.
 
@@ -13,11 +13,12 @@ This is an application-like control room, not a CopilotWith information site.
 1. Watch .NET, COBOL, Progress, Uniface, Liferay, middleware, HDInsight, and Azure DevOps estates route to specialist packs.
 2. See Estate Intelligence and Governed Execution operate as one evidence-led loop.
 3. Explore 11 specialist routes with their agents, skills, method, inputs, outputs, maturity, and guardrails.
-4. Let the mission stream explainable Application X-Ray evidence and activate repository-grounded agents.
-5. Inspect the 127-definition CopilotWith agent library and live handoffs.
-6. Change priorities and customer constraints, then approve a bounded plan.
-7. Transform an MSMQ publisher and review build, test, security, container, and pull-request evidence.
-8. Generate portfolio waves and explore the five-level controlled adoption model.
+4. Run Understand, Protect, and Deliver missions against the source-grounded Microsoft eShopOnWeb structure.
+5. Switch to the illustrative Contoso University payload and stream explainable legacy Application X-Ray evidence.
+6. Inspect the 127-definition CopilotWith agent library and replayed handoffs.
+7. Change priorities and customer constraints, then approve a bounded plan.
+8. Transform an illustrative MSMQ publisher and review build, test, security, container, and pull-request evidence.
+9. Generate portfolio waves and explore the five-level controlled adoption model.
 
 Autoplay handles the first act without presenter input and deliberately stops at architecture approval. Three persona controls change the estate emphasis for executives, architects, and developers.
 
@@ -49,6 +50,6 @@ docs/                  Architecture, demo script, and provenance
 
 ## Demo boundary
 
-The current build is a deterministic replay, not a live repository scanner. Contoso University, its topology, generated code, validation outcomes, projected readiness, and portfolio metrics are illustrative and labelled accordingly. Application domains, named agent patterns, and the 127-definition inventory are grounded in the CopilotWith source repository.
+The current build is a deterministic replay, not a live repository scanner. The eShopOnWeb project inventory and deployment assets are source-grounded; its timed agent activity is replayed. Contoso University, its topology, generated code, validation outcomes, projected readiness, and portfolio metrics are illustrative and labelled accordingly. Application domains, named agent patterns, and the 127-definition inventory are grounded in the CopilotWith source repository.
 
 See [data provenance](docs/DATA-PROVENANCE.md), [architecture](docs/ARCHITECTURE.md), and the [customer demo script](docs/DEMO-SCRIPT.md).

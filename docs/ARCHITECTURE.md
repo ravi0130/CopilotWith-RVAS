@@ -2,13 +2,16 @@
 
 ## Current implementation
 
-The accelerator is a client-side React application with a deterministic mission state machine in `src/MissionControl.tsx`. It models application-domain rotation, the two-layer framework, pack routing, autonomous scene progression, scan progress, specialist selection, agent handoffs, plan constraints, human approvals, transformation output, validation evidence, architecture progression, portfolio waves, and adoption level.
+The accelerator is a client-side React application with a deterministic mission state machine in `src/MissionControl.tsx`. It models application-domain rotation, the two-layer framework, pack routing, an eShopOnWeb application demo lab, autonomous scene progression, scan progress, specialist selection, agent handoffs, plan constraints, human approvals, transformation output, validation evidence, architecture progression, portfolio waves, and adoption level.
+
+Two applications serve different purposes. Microsoft eShopOnWeb grounds the Demo Lab in an observed ASP.NET Core 8 project and deployment structure. Contoso University is a controlled illustrative legacy payload used to demonstrate blocker discovery, planning, transformation, and proof without implying measured results.
 
 ```mermaid
 flowchart LR
     M[Application launch bay] --> G[Two-layer operating model]
     G --> R[Specialist pack atlas]
-    R --> X[Streaming Application X-Ray]
+    R --> D[eShopOnWeb Demo Lab]
+    D --> X[Illustrative legacy Application X-Ray]
     X --> A[Agent fleet and handoffs]
     A --> P[Autoplay stops at human decision]
     P --> T[Bounded transformation]
@@ -17,7 +20,9 @@ flowchart LR
     F --> W[Portfolio waves and adoption ladder]
 ```
 
-The current implementation has no backend, authentication, telemetry, or customer repository connection. Its guided replay is deterministic so customer demonstrations do not depend on network or model variance.
+The Demo Lab maintains the selected Understand, Protect, or Deliver mission in React state. Autoplay rotates those missions before progressing to the X-Ray; presenter controls can pause the sequence and select any mission directly.
+
+The current implementation has no backend, authentication, telemetry, or customer repository connection. Its guided replay is deterministic, and the eShopOnWeb storefront is stored locally, so customer demonstrations do not depend on network or model variance.
 
 ## Target modes
 

@@ -9,13 +9,14 @@ import {
 import './MissionControl.css'
 
 type Persona = 'Executive' | 'Architect' | 'Developer'
-type Scene = 'brief' | 'framework' | 'packs' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
+type Scene = 'brief' | 'framework' | 'packs' | 'demos' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
 type AgentId = 'archaeologist' | 'dependency' | 'planner' | 'architect' | 'integration' | 'security' | 'test' | 'deployment'
 
 const scenes: Array<{ id: Scene; label: string; verb: string }> = [
   { id: 'brief', label: 'Mission', verb: 'ENTER' },
   { id: 'framework', label: 'Operating Model', verb: 'GOVERN' },
   { id: 'packs', label: 'Pack Atlas', verb: 'ROUTE' },
+  { id: 'demos', label: 'App Demo Lab', verb: 'DEMO' },
   { id: 'xray', label: 'Application X-Ray', verb: 'DISCOVER' },
   { id: 'fleet', label: 'Agent Team', verb: 'ORCHESTRATE' },
   { id: 'plan', label: 'Modernisation Plan', verb: 'DECIDE' },
@@ -102,6 +103,30 @@ const adoptionLevels = [
   ['05', 'PORTFOLIO OPERATING MODEL', 'Patterns, controls and evidence govern the whole estate.'],
 ]
 
+const eshopMissions = [
+  {
+    id: 'understand', verb: 'UNDERSTAND', title: 'Reconstruct the application', agent: 'Documentation Agent', status: 'MAPPING REPOSITORY', icon: Search,
+    prompt: 'Explain this application, its deployable surfaces, and its architectural boundaries.',
+    evidence: ['eShopOnWeb.sln', '6 source projects', 'Project references', 'Runtime configuration'],
+    events: ['Solution and project graph indexed', 'Domain core isolated from infrastructure', 'Two deployable surfaces identified', 'Blazor admin boundary traced'],
+    output: 'CURRENT-STATE HLD + DEPENDENCY GRAPH',
+  },
+  {
+    id: 'protect', verb: 'PROTECT', title: 'Freeze observable behaviour', agent: 'Testing Agent', status: 'BUILDING SAFETY NET', icon: TestTube2,
+    prompt: 'Before changing architecture, show which behaviours are protected and where evidence is missing.',
+    evidence: ['UnitTests', 'IntegrationTests', 'FunctionalTests', 'PublicApiIntegrationTests'],
+    events: ['Four test projects discovered', 'Domain rules mapped to unit tests', 'Web journeys mapped to functional tests', 'API contracts mapped to integration tests'],
+    output: 'CHARACTERISATION PLAN + PARITY GATES',
+  },
+  {
+    id: 'deliver', verb: 'DELIVER', title: 'Prepare a governed cloud path', agent: 'Deployment Agent', status: 'ASSEMBLING DELIVERY', icon: Rocket,
+    prompt: 'Show the smallest reviewable route from local composition to an Azure-hosted deployment.',
+    evidence: ['Web Dockerfile', 'PublicApi Dockerfile', 'docker-compose.yml', 'azure.yaml + Bicep'],
+    events: ['Web and PublicApi images detected', 'SQL dependency mapped', 'App Service host declared', 'Infrastructure and Key Vault path linked'],
+    output: 'CONTAINER + AZD + BICEP EVIDENCE PACK',
+  },
+]
+
 function MissionControl() {
   const [scene, setScene] = useState<Scene>('brief')
   const [persona, setPersona] = useState<Persona>('Architect')
@@ -122,6 +147,7 @@ function MissionControl() {
   const [applicationIndex, setApplicationIndex] = useState(0)
   const [packIndex, setPackIndex] = useState(0)
   const [adoptionLevel, setAdoptionLevel] = useState(2)
+  const [demoMission, setDemoMission] = useState(0)
 
   const sceneIndex = scenes.findIndex((item) => item.id === scene)
 
@@ -170,10 +196,21 @@ function MissionControl() {
     if (!autoDemo || scene !== 'packs') return
     const carousel = window.setInterval(() => setPackIndex((value) => (value + 1) % packCatalog.length), 1050)
     const launch = window.setTimeout(() => {
+      setScene('demos')
+      setDemoMission(0)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 12600)
+    return () => { clearInterval(carousel); clearTimeout(launch) }
+  }, [autoDemo, scene])
+
+  useEffect(() => {
+    if (!autoDemo || scene !== 'demos') return
+    const carousel = window.setInterval(() => setDemoMission((value) => (value + 1) % eshopMissions.length), 2600)
+    const launch = window.setTimeout(() => {
       setScene('xray')
       setScan(1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    }, 12600)
+    }, 9000)
     return () => { clearInterval(carousel); clearTimeout(launch) }
   }, [autoDemo, scene])
 
@@ -201,6 +238,7 @@ function MissionControl() {
   const go = (next: Scene) => {
     setScene(next)
     setMenuOpen(false)
+    if (scenes.findIndex((item) => item.id === next) >= scenes.findIndex((item) => item.id === 'plan')) setAutoDemo(false)
     if (next === 'xray' && scan === 0) setScan(1)
     if (next === 'fleet') setHandoffStep(0)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -208,7 +246,8 @@ function MissionControl() {
 
   const next = () => sceneIndex < scenes.length - 1 && go(scenes[sceneIndex + 1].id)
   const previous = () => sceneIndex > 0 && go(scenes[sceneIndex - 1].id)
-  const activeStatus = scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : scene === 'framework' ? 'TWO-LAYER GOVERNED OPERATING MODEL' : scene === 'packs' ? packCatalog[packIndex].name.toUpperCase() : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'
+  const autoplayAvailable = sceneIndex < scenes.findIndex((item) => item.id === 'plan')
+  const activeStatus = scene === 'brief' ? applicationTypes[applicationIndex].name.toUpperCase() : scene === 'framework' ? 'TWO-LAYER GOVERNED OPERATING MODEL' : scene === 'packs' ? packCatalog[packIndex].name.toUpperCase() : scene === 'demos' ? `ESHOPONWEB · ${eshopMissions[demoMission].verb}` : 'CONTOSO UNIVERSITY · .NET FRAMEWORK 4.8'
 
   return <div className="mc-shell">
     <header className="mc-topbar">
@@ -227,7 +266,7 @@ function MissionControl() {
     <div className="mc-statusbar">
       <span><i /> {autoDemo ? 'AUTONOMOUS DEMO RUNNING' : 'PRESENTER CONTROL'}</span>
       <span className="app-status"><b>{scene === 'packs' ? 'ACTIVE PACK' : 'ACTIVE MISSION'}</b> {activeStatus}</span>
-      <button className="autoplay-toggle" onClick={() => setAutoDemo((value) => !value)}>{autoDemo ? <Pause /> : <Play />} {autoDemo ? 'PAUSE' : 'AUTOPLAY'}</button>
+      <button className="autoplay-toggle" disabled={!autoplayAvailable} onClick={() => setAutoDemo((value) => !value)}>{autoDemo ? <Pause /> : <Play />} {autoDemo ? 'PAUSE' : autoplayAvailable ? 'AUTOPLAY' : 'MANUAL ONLY'}</button>
       <div className="persona-switch"><small>VIEW AS</small>{(['Executive', 'Architect', 'Developer'] as Persona[]).map((item) => <button key={item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>{item}</button>)}</div>
     </div>
 
@@ -235,6 +274,7 @@ function MissionControl() {
       {scene === 'brief' && <BriefScene selected={applicationIndex} onSelect={setApplicationIndex} onStart={() => { setAutoDemo(true); go('framework') }} />}
       {scene === 'framework' && <FrameworkScene onNext={next} />}
       {scene === 'packs' && <PackAtlasScene selected={packIndex} onSelect={setPackIndex} onNext={next} />}
+      {scene === 'demos' && <DemoLabScene selected={demoMission} onSelect={setDemoMission} onNext={next} />}
       {scene === 'xray' && <XrayScene scan={scan} focus={focus} onFocus={setFocus} onNext={next} />}
       {scene === 'fleet' && <FleetScene selected={agent} onSelect={setAgent} handoffStep={handoffStep} onReplay={() => setHandoffStep(0)} onNext={next} />}
       {scene === 'plan' && <PlanScene priority={priority} constraint={constraint} approved={approved} onPriority={(value) => { setPriority(value); setApproved(false) }} onConstraint={(value) => { setConstraint(value); setApproved(false) }} onApprove={() => setApproved(true)} onNext={next} />}
@@ -344,10 +384,40 @@ function PackAtlasScene({ selected, onSelect, onNext }: { selected: number; onSe
   </SceneFrame>
 }
 
+function DemoLabScene({ selected, onSelect, onNext }: { selected: number; onSelect: (value: number) => void; onNext: () => void }) {
+  const mission = eshopMissions[selected]
+  const MissionIcon = mission.icon
+  const architecture = [
+    ['WEB', 'MVC + Razor', Code2], ['ADMIN', 'Blazor WASM', Layers3], ['API', 'PublicApi', Network],
+    ['CORE', 'Domain model', Braces], ['INFRA', 'EF Core + Identity', Database], ['SQL', 'Catalog + Identity', Server],
+  ]
+  return <SceneFrame number="03" eyebrow="APP MODERNISATION DEMO LAB" title="Watch CopilotWith work on a real application." summary="eShopOnWeb is the stage: a source-grounded .NET 8 reference application with six source projects, four test projects, two container entry points, and Azure deployment assets." ghcp="Reads the solution, explains code, traces dependencies, proposes tests and prepares bounded engineering changes." copilotwith="Sequences specialist missions, labels evidence, exposes outputs and keeps architecture and deployment decisions human-owned.">
+    <div className="demo-lab">
+      <header className="demo-commandbar"><div><span className="live-dot" /><small>SOURCE-GROUNDED REPLAY</small><strong>Microsoft eShopOnWeb</strong><em>ASP.NET Core 8 · MONOLITHIC REFERENCE APPLICATION</em></div><div className="demo-facts"><span><b>6</b>SOURCE PROJECTS</span><span><b>4</b>TEST PROJECTS</span><span><b>2</b>APP CONTAINERS</span><span><b>1</b>GOVERNED MISSION</span></div></header>
+      <nav className="demo-missions" aria-label="eShopOnWeb demo missions">{eshopMissions.map((item, index) => { const Icon = item.icon; return <button key={item.id} className={selected === index ? 'active' : ''} onClick={() => onSelect(index)} aria-pressed={selected === index}><span>0{index + 1}</span><Icon /><small>{item.verb}</small><strong>{item.title}</strong><i /></button> })}</nav>
+      <div className="demo-stage">
+        <div className="eshop-viewport">
+          <header><span><i /><i /><i /></span><b>ESHOPONWEB · APPLICATION VIEW</b><em>OBSERVED</em></header>
+          <div className="eshop-screen"><img src={`${import.meta.env.BASE_URL}eshoponweb-storefront.png`} alt="eShopOnWeb catalogue storefront" /><span className="source-scan" /><div className="screen-callout"><Activity /><span><small>ACTIVE MISSION</small><strong>{mission.title}</strong></span></div></div>
+          <div className="repo-topology">{architecture.map(([name, detail, Icon], index) => { const TypedIcon = Icon as typeof Code2; return <div key={String(name)} className={selected === 0 || index >= selected * 2 ? 'lit' : ''}><TypedIcon /><span><b>{name as string}</b><small>{detail as string}</small></span></div> })}<svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M8 8 L42 21 L58 21 L92 8 M25 8 L42 21 M75 8 L58 21" /></svg></div>
+        </div>
+        <aside className="agent-runner" aria-live="polite">
+          <header><span><MissionIcon /></span><div><small>AGENT IN ACTION</small><h2>{mission.agent}</h2><p>{mission.status}</p></div><i /></header>
+          <div className="demo-prompt"><MessageSquareText /><span><small>PRESENTER PROMPT</small>{mission.prompt}</span></div>
+          <div className="evidence-inputs"><span>REPLAYING SOURCE-GROUNDED EVIDENCE</span>{mission.evidence.map((item, index) => <div key={item} style={{ animationDelay: `${index * .18}s` }}><FileText /><b>{item}</b><Check /></div>)}</div>
+          <div className="agent-terminal"><header><span>AGENT EXECUTION REPLAY</span><b>SIMULATED</b></header>{mission.events.map((event, index) => <p key={event} style={{ animationDelay: `${index * .24}s` }}><time>00:0{index + 1}</time><Check /><span>{event}</span></p>)}</div>
+          <div className="demo-output"><GitPullRequest /><span><small>REVIEWABLE OUTPUT</small><strong>{mission.output}</strong><em>Human review required before any change</em></span></div>
+        </aside>
+      </div>
+      <div className="demo-path"><span><b>REPOSITORY</b> eShopOnWeb.sln</span><ArrowRight /><span><b>SPECIALIST AGENT</b> {mission.agent}</span><ArrowRight /><span><b>EVIDENCE</b> {mission.output}</span><ArrowRight /><span className="human-stop"><b>HUMAN GATE</b> Decide what changes</span><button className="main-action" onClick={onNext}>RUN A LEGACY X-RAY <ArrowRight /></button></div>
+    </div>
+  </SceneFrame>
+}
+
 function XrayScene({ scan, focus, onFocus, onNext }: { scan: number; focus: string; onFocus: (value: string) => void; onNext: () => void }) {
   const selected = blockers.find((item) => item.id === focus) ?? blockers[1]
   const SelectedIcon = selected.icon
-  return <SceneFrame number="01" eyebrow="UNDERSTAND AN UNFAMILIAR APPLICATION" title="Copilot turns source code into an application X-Ray." summary="The graph is the explanation. Ask a question and the application shows you the answer." ghcp="Assesses the codebase, identifies upgrade blockers and traces affected code." copilotwith="Assigns evidence to specialists and keeps findings separate from decisions.">
+  return <SceneFrame number="04" eyebrow="UNDERSTAND AN UNFAMILIAR APPLICATION" title="Copilot turns source code into an application X-Ray." summary="The graph is the explanation. Ask a question and the application shows you the answer." ghcp="Assesses the codebase, identifies upgrade blockers and traces affected code." copilotwith="Assigns evidence to specialists and keeps findings separate from decisions.">
     <div className="xray-workspace">
       <div className="xray-canvas">
         <div className="scan-head"><span><Activity /> ANALYSING CONTOSO UNIVERSITY</span><div><i style={{ width: `${scan}%` }} /></div><b>{scan}%</b></div>
@@ -375,7 +445,7 @@ function XrayScene({ scan, focus, onFocus, onNext }: { scan: number; focus: stri
 function FleetScene({ selected, onSelect, handoffStep, onReplay, onNext }: { selected: AgentId; onSelect: (value: AgentId) => void; handoffStep: number; onReplay: () => void; onNext: () => void }) {
   const current = agents[selected]
   const CurrentIcon = current.icon
-  return <SceneFrame number="02" eyebrow="MEET YOUR DIGITAL ENGINEERING TEAM" title="Specialist agents take ownership, then hand work forward." summary="This is not one chatbot doing everything. It is an engineering organisation with expertise, tools and boundaries." ghcp="Runs specialised custom agents for recurring analysis and implementation tasks." copilotwith="Orchestrates missions, handoffs, evidence and mandatory human control points.">
+  return <SceneFrame number="05" eyebrow="MEET YOUR DIGITAL ENGINEERING TEAM" title="Specialist agents take ownership, then hand work forward." summary="This is not one chatbot doing everything. It is an engineering organisation with expertise, tools and boundaries." ghcp="Runs specialised custom agents for recurring analysis and implementation tasks." copilotwith="Orchestrates missions, handoffs, evidence and mandatory human control points.">
     <div className="fleet-workspace">
       <div className="constellation-panel">
         <div className="orchestrator-core"><Radar /><strong>COPILOTWITH</strong><span>ORCHESTRATOR</span><i /></div>
@@ -396,7 +466,7 @@ function PlanScene({ priority, constraint, approved, onPriority, onConstraint, o
     ['MOD-019', constraint === 'Database unchanged' ? 'Retain SQL schema behind compatibility layer' : 'Externalise persistence boundary', 'Cloud Architect'],
     ['MOD-024', 'Containerise and create GitHub Actions workflow', 'Deployment Engineer'],
   ]
-  return <SceneFrame number="03" eyebrow="HUMAN-DIRECTED MODERNISATION" title="Break the plan. Watch it adapt." summary="Real programmes have constraints. Change one and Copilot recomputes the sequence, effort, risk and assigned agents." ghcp="Produces a customisable plan from assessment findings and iterates through blockers." copilotwith="Applies programme patterns, records assumptions and requires approval before change.">
+  return <SceneFrame number="06" eyebrow="HUMAN-DIRECTED MODERNISATION" title="Break the plan. Watch it adapt." summary="Real programmes have constraints. Change one and Copilot recomputes the sequence, effort, risk and assigned agents." ghcp="Produces a customisable plan from assessment findings and iterates through blockers." copilotwith="Applies programme patterns, records assumptions and requires approval before change.">
     <div className="plan-workspace">
       <aside className="plan-config"><label>OPTIMISE FOR</label>{planOptions.map((item) => <button key={item} className={priority === item ? 'selected' : ''} onClick={() => onPriority(item)}><i />{item}</button>)}<label>ADD A REAL-WORLD CONSTRAINT</label><select value={constraint} onChange={(event) => onConstraint(event.target.value)}>{constraints.map((item) => <option key={item}>{item}</option>)}</select><div className="plan-impact"><span>PROJECTED READINESS</span><strong>{priority === 'Lowest risk' ? '91' : priority === 'Fastest migration' ? '84' : '88'}<small>/100</small></strong><p>Demo estimate · not a measured customer outcome</p></div></aside>
       <div className="generated-plan"><header><div><small>GHCP APP MODERNISATION PLAN</small><h2>Lowest-risk path to Azure Container Apps</h2></div><span>REVISION {constraint === 'Database unchanged' ? '04' : '05'}</span></header>{tasks.map(([id, title, owner], index) => <div className="plan-task" key={id}><span>{String(index + 1).padStart(2, '0')}</span><div><small>{id}</small><strong>{title}</strong><em>{owner}</em></div><b>{index < 2 ? 'FOUNDATION' : index < 4 ? 'TRANSFORM' : 'DELIVER'}</b></div>)}<div className="decision-gate"><LockKeyhole /><div><small>DECISION REQUIRED</small><strong>Approve Azure Service Bus and the bounded messaging pilot</strong><p>Agents can recommend and prepare. Architecture, scope and risk remain human decisions.</p></div>{approved ? <span className="approved"><Check /> APPROVED</span> : <button onClick={onApprove}>APPROVE RECOMMENDATION</button>}</div>{approved && <button className="main-action plan-next" onClick={onNext}>MODERNISE THE MESSAGING COMPONENT <ArrowRight /></button>}</div>
@@ -405,7 +475,7 @@ function PlanScene({ priority, constraint, approved, onPriority, onConstraint, o
 }
 
 function TransformScene({ transformed, onTransform, onNext }: { transformed: boolean; onTransform: () => void; onNext: () => void }) {
-  return <SceneFrame number="04" eyebrow="BOUNDED CODE TRANSFORMATION" title="Now the application actually changes." summary="The approved task becomes a reviewable code change, updated configuration, tests and deployment assets." ghcp="Implements the recommendation, fixes build issues, creates tests and container assets." copilotwith="Keeps the change bounded, captures provenance and routes the result to independent gates.">
+  return <SceneFrame number="07" eyebrow="BOUNDED CODE TRANSFORMATION" title="Now the application actually changes." summary="The approved task becomes a reviewable code change, updated configuration, tests and deployment assets." ghcp="Implements the recommendation, fixes build issues, creates tests and container assets." copilotwith="Keeps the change bounded, captures provenance and routes the result to independent gates.">
     <div className="transform-workspace">
       <div className="editor-shell"><header><span><FileCode2 /> BEFORE · QueuePublisher.cs</span><span className={transformed ? 'ready' : ''}><Code2 /> AFTER · ServiceBusPublisher.cs</span><b>MOD-014</b></header><div className="code-compare"><pre className="before"><code>{`using System.Messaging;\n\npublic void Publish(Enrollment item)\n{\n    var queue = new MessageQueue(\n        @".\\Private$\\enrollment");\n    queue.Send(item);\n}\n\n// Windows-only MSMQ dependency`}</code></pre><pre className={transformed ? 'after revealed' : 'after'}><code>{transformed ? `public async Task PublishAsync(\n    Enrollment item, CancellationToken ct)\n{\n    var payload = BinaryData.FromObjectAsJson(item);\n    await sender.SendMessageAsync(\n        new ServiceBusMessage(payload), ct);\n}\n\n// Cloud-ready messaging abstraction` : `// Integration Moderniser waiting\n// for an approved architecture decision.\n\n// No code has been changed yet.`}</code></pre></div><footer><span>FILES <b>{transformed ? '14 changed' : '—'}</b></span><span>DIFF <b>{transformed ? '+228 / -163' : '—'}</b></span><span>PACKAGES <b>{transformed ? '3 updated' : '—'}</b></span><span>TESTS <b>{transformed ? '12 added' : '—'}</b></span></footer></div>
       <aside className="run-panel"><span>AGENT EXECUTION</span>{[['Integration Moderniser', 'Refactor messaging boundary', Code2], ['Test Engineer', 'Create compatibility tests', TestTube2], ['Security Guardian', 'Inspect identity and packages', ShieldCheck], ['Deployment Engineer', 'Add container configuration', Box]].map(([name, task, Icon], index) => { const TypedIcon = Icon as typeof Code2; return <div className={transformed ? 'run-step complete' : 'run-step'} key={String(name)}><TypedIcon /><div><strong>{name as string}</strong><small>{transformed ? ['Refactor prepared', '12 tests created', 'Identity control added', 'Container assets ready'][index] : task as string}</small></div>{transformed ? <Check /> : <i />}</div> })}{transformed ? <><div className="terminal-output"><span>$ dotnet build</span><p>Build succeeded. 0 Error(s)</p><span>$ dotnet test</span><p>47 passed in 8.4s</p></div><button className="main-action" onClick={onNext}>PROVE THE CHANGE <ArrowRight /></button></> : <button className="transform-button" onClick={onTransform}><Zap /> MODERNISE THIS COMPONENT</button>}</aside>
@@ -421,7 +491,7 @@ function ValidateScene({ validated, onValidate, onNext }: { validated: boolean; 
     ['Container', 'Linux image + health probe', 'PASSED', Box],
     ['Pull request', 'Code, ADR and rollback', '#47 READY', GitPullRequest],
   ]
-  return <SceneFrame number="05" eyebrow="SECURITY · TEST · REVIEW" title="Proof, not AI theatre." summary="Every claim resolves to evidence. Independent agents check the change before a human decides whether it can progress." ghcp="Runs the build/fix/test loop, security analysis and pull-request preparation." copilotwith="Defines the gates, separates maker from checker and preserves the approval record.">
+  return <SceneFrame number="08" eyebrow="SECURITY · TEST · REVIEW" title="Proof, not AI theatre." summary="Every claim resolves to evidence. Independent agents check the change before a human decides whether it can progress." ghcp="Runs the build/fix/test loop, security analysis and pull-request preparation." copilotwith="Defines the gates, separates maker from checker and preserves the approval record.">
     <div className="proof-workspace">
       <div className="proof-list">{checks.map(([name, detail, status, Icon], index) => { const TypedIcon = Icon as typeof PackageCheck; return <div key={String(name)} className={validated ? 'passed' : ''}><TypedIcon /><span><small>GATE {String(index + 1).padStart(2, '0')}</small><strong>{name as string}</strong><p>{detail as string}</p></span><b>{validated ? status as string : 'WAITING'}</b>{validated ? <Check /> : <i />}</div> })}</div>
       <div className="security-gate"><header><ShieldCheck /><div><small>GATE 03 · SECURITY REVIEW</small><h2>Two findings required action</h2></div></header><div className="security-items"><span><Check /> Secrets exposure <b>NONE</b></span><span><Check /> Unsupported package <b>UPDATED</b></span><span><Check /> Managed identity <b>CONFIGURED</b></span><span><Check /> Public network access <b>DISABLED</b></span></div>{validated ? <div className="pr-card"><GitPullRequest /><div><small>PR #47 · ILLUSTRATIVE REPLAY</small><strong>Modernise enrollment messaging</strong><p>14 files · 12 tests · ADR · rollback plan</p></div><span>READY FOR HUMAN REVIEW</span></div> : <button className="validate-button" onClick={onValidate}><ShieldCheck /> RUN VALIDATION GATES</button>}</div>
@@ -438,14 +508,14 @@ function TimeScene({ value, onChange, onNext }: { value: number; onChange: (valu
     ['Local file system', 'Azure Blob Storage', FileText, Database],
     ['Manual deployment', 'GitHub Actions', Users, GitBranch],
   ]
-  return <SceneFrame number="06" eyebrow="MODERNISATION TIME MACHINE" title="Drag the architecture through the change." summary="At each point the diagram shows a credible transition state, not a fictional big-bang rewrite." ghcp="Produces the code, tests, containers and deployment assets for each bounded slice." copilotwith="Sequences those slices into a reversible journey with evidence at every gate.">
+  return <SceneFrame number="09" eyebrow="MODERNISATION TIME MACHINE" title="Drag the architecture through the change." summary="At each point the diagram shows a credible transition state, not a fictional big-bang rewrite." ghcp="Produces the code, tests, containers and deployment assets for each bounded slice." copilotwith="Sequences those slices into a reversible journey with evidence at every gate.">
     <div className="time-workspace"><header><span>LEGACY APPLICATION</span><strong>{value}% MODERNISED</strong><span>CLOUD-READY PRODUCT</span></header><input aria-label="Modernisation progress" type="range" min="0" max="100" value={value} onChange={(event) => onChange(Number(event.target.value))} /><div className="transition-grid">{transitions.map(([before, after, BeforeIcon, AfterIcon], index) => { const LeftIcon = BeforeIcon as typeof Server; const RightIcon = AfterIcon as typeof Cloud; const switched = value > 15 + index * 17; return <div key={String(before)} className={switched ? 'switched' : ''}><span><LeftIcon />{before as string}</span><i><ArrowRight /></i><span><RightIcon />{after as string}</span></div> })}</div><div className="architecture-stage"><div className="legacy-stack" style={{ opacity: Math.max(.12, 1 - value / 100) }}><Server /><b>CONTOSO UNIVERSITY</b><span>Coupled Windows application</span></div><div className="transformation-energy"><Sparkles /><strong>{value < 35 ? 'DISCOVERING' : value < 70 ? 'TRANSFORMING' : 'CLOUD-READY'}</strong></div><div className="modern-stack" style={{ opacity: Math.max(.12, value / 100) }}><Cloud /><b>MODERN PRODUCT</b><span>Containerised services on Azure</span></div></div><button className="main-action time-next" onClick={onNext}>THAT IS ONE APP. WHAT ABOUT 300? <ArrowRight /></button></div>
   </SceneFrame>
 }
 
 function ScaleScene({ waves, persona, adoptionLevel, onAdoptionLevel, onGenerate, onRestart }: { waves: boolean; persona: Persona; adoptionLevel: number; onAdoptionLevel: (value: number) => void; onGenerate: () => void; onRestart: () => void }) {
   const apps = Array.from({ length: 72 }, (_, index) => ({ id: index, x: 5 + ((index * 37) % 89), y: 7 + ((index * 53) % 80), wave: index < 16 ? 1 : index < 39 ? 2 : index < 59 ? 3 : 4 }))
-  return <SceneFrame number="07" eyebrow="FROM ONE APPLICATION TO AN ESTATE" title="This is where Copilot becomes a modernisation programme." summary="The same evidence, patterns, specialists and human gates can organise 5, 50 or 500 applications into executable waves." ghcp="Provides the analysis and engineering capacity across the software lifecycle." copilotwith="Standardises the method, allocates specialists and governs portfolio-scale progression.">
+  return <SceneFrame number="10" eyebrow="FROM ONE APPLICATION TO AN ESTATE" title="This is where Copilot becomes a modernisation programme." summary="The same evidence, patterns, specialists and human gates can organise 5, 50 or 500 applications into executable waves." ghcp="Provides the analysis and engineering capacity across the software lifecycle." copilotwith="Standardises the method, allocates specialists and governs portfolio-scale progression.">
     <div className="scale-workspace"><div className="estate-map"><span className="axis-y">BUSINESS CRITICALITY</span><span className="axis-x">MODERNISATION COMPLEXITY</span>{apps.map((app) => <i key={app.id} className={waves ? `app-dot wave-${app.wave}` : 'app-dot'} style={waves ? { left: `${8 + (app.wave - 1) * 24}%`, top: `${9 + (app.id % 16) * 5.25}%` } : { left: `${app.x}%`, top: `${app.y}%` }} />)}{waves && <div className="wave-headings"><span>WAVE 1<small>QUICK WINS</small></span><span>WAVE 2<small>MODERATE</small></span><span>WAVE 3<small>TRANSFORM</small></span><span>WAVE 4<small>COMPLEX</small></span></div>}</div><aside className="estate-panel"><span>APPLICATION ESTATE · {persona.toUpperCase()} VIEW</span><h2>127 applications</h2><div className="estate-stats"><p><strong>32</strong><span>assessed</span></p><p><strong>11</strong><span>high risk</span></p><p><strong>23</strong><span>Wave 1 candidates</span></p></div>{waves ? <div className="capacity"><small>AI + HUMAN CAPACITY</small><span><Bot /> 8 application agents</span><span><Cloud /> 3 architecture agents</span><span><ShieldCheck /> 2 security agents</span><span><Users /> 5 human reviewers</span></div> : <button className="generate-waves" onClick={onGenerate}><Sparkles /> GENERATE MODERNISATION WAVES</button>}</aside></div>
     {waves && <><div className="adoption-console"><header><div><span>CONTROLLED ADOPTION</span><strong>Start with trust you can earn.</strong></div><b>RECOMMENDED START · LEVEL 02</b></header><div className="adoption-levels">{adoptionLevels.map(([number, title, detail], index) => <button key={number} className={adoptionLevel === index + 1 ? 'active' : ''} onClick={() => onAdoptionLevel(index + 1)}><span>{number}</span><strong>{title}</strong><small>{detail}</small>{index === 1 && <em>START HERE</em>}</button>)}</div><div className="adoption-boundary"><ShieldCheck /><span><small>CONTROL DOES NOT DISAPPEAR AS CAPABILITY GROWS</small>Every level retains evidence labels, human stage gates, pull-request review and accountable acceptance.</span><div><b>PROVEN</b> Middleware factory</div><div><b>DEMONSTRATED</b> App modernisation</div><div><b>DESIGNED</b> Specialist accelerators</div></div></div><div className="final-reveal"><div><span>WHAT JUST HAPPENED?</span><h2>Copilot gives engineers superpowers. CopilotWith industrialises those superpowers across the application estate.</h2></div><div className="operating-model"><span>CUSTOMER <b>Priorities · constraints · approvals</b></span><span>COPILOTWITH <b>Method · governance · orchestration</b></span><span>GITHUB COPILOT <b>Assess · plan · transform · validate</b></span><span>AZURE <b>Target · deploy · operate</b></span></div><button onClick={onRestart}>REPLAY THE MISSION <RefreshCw /></button></div></>}
   </SceneFrame>
