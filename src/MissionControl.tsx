@@ -9,16 +9,31 @@ import {
 import './MissionControl.css'
 
 type Persona = 'Executive' | 'Architect' | 'Developer'
-
-const personaLenses: Record<Persona, { label: string; objective: string }> = {
-  Executive: { label: 'OUTCOMES + INVESTMENT', objective: 'See portfolio risk, investment priorities, delivery confidence and accountable value.' },
-  Architect: { label: 'BOUNDARIES + DECISIONS', objective: 'See system boundaries, dependencies, target design choices and governance controls.' },
-  Developer: { label: 'IMPLEMENTATION + PROOF', objective: 'See bounded engineering tasks, code changes, tests and delivery evidence.' },
-}
 type Scene = 'possibility' | 'brief' | 'framework' | 'packs' | 'demos' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
 type DemoId = 'eshop' | 'contoso' | 'petclinic'
 type DemoPhase = 'before' | 'plan' | 'after'
 type AgentId = 'archaeologist' | 'dependency' | 'planner' | 'architect' | 'integration' | 'security' | 'test' | 'deployment'
+
+const personaLenses: Record<Persona, { label: string; question: string; decision: string }> = {
+  Executive: { label: 'OUTCOMES + INVESTMENT', question: 'What outcome improves, what risk falls and what investment is justified?', decision: 'Confirm priority, funding, risk appetite and accountable owner.' },
+  Architect: { label: 'BOUNDARIES + DECISIONS', question: 'Which boundaries, dependencies and transition states make the change viable?', decision: 'Approve target direction, constraints and reversible architecture choices.' },
+  Developer: { label: 'IMPLEMENTATION + PROOF', question: 'What bounded change can be built, tested and reviewed without losing behaviour?', decision: 'Confirm task clarity, engineering feasibility and evidence needed for merge.' },
+}
+
+const sceneFocus: Record<Scene, string> = {
+  possibility: 'Where GitHub Copilot can accelerate engineering, and where human judgment remains essential.',
+  brief: 'The application type, business intent and constraints that define the modernisation mission.',
+  framework: 'How evidence-led agents, governance controls and human gates work as one operating model.',
+  packs: 'Which specialist agent pack matches the technology, evidence available and required outcome.',
+  demos: 'A concrete before-to-plan-to-after journey, grounded in an application rather than a generic promise.',
+  xray: 'Observed dependencies, blockers and uncertainty that must shape scope before implementation begins.',
+  fleet: 'How specialist agents divide work, hand off evidence and remain inside explicit authority boundaries.',
+  plan: 'The proposed sequence, constraints and approval points that turn findings into reviewable delivery.',
+  transform: 'The bounded code and configuration change being made, with the approved plan held constant.',
+  validate: 'Behavioural parity, security checks and build evidence required before the change can progress.',
+  time: 'The measurable difference between the legacy baseline and the modernised target state.',
+  scale: 'How application-level evidence becomes portfolio waves, capacity choices and investment sequencing.',
+}
 
 const scenes: Array<{ id: Scene; label: string; verb: string }> = [
   { id: 'possibility', label: 'Art of Possibility', verb: 'IMAGINE' },
@@ -326,8 +341,10 @@ function MissionControl() {
     </div>
 
     <div className="persona-context" role="status" aria-live="polite">
-      <b>{persona.toUpperCase()} · {personaLenses[persona].label}</b>
-      <span>{personaLenses[persona].objective}</span>
+      <header><small>VIEWING THIS SCENE AS</small><b>{persona.toUpperCase()}<span>{personaLenses[persona].label}</span></b></header>
+      <div><small>YOUR KEY QUESTION</small><span>{personaLenses[persona].question}</span></div>
+      <div><small>WHAT THIS SCENE CONTRIBUTES</small><span>{sceneFocus[scene]}</span></div>
+      <div><small>YOUR DECISION / ACTION</small><span>{personaLenses[persona].decision}</span></div>
     </div>
 
     <main className="mc-main">
