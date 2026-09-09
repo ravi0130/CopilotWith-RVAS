@@ -9,6 +9,12 @@ import {
 import './MissionControl.css'
 
 type Persona = 'Executive' | 'Architect' | 'Developer'
+
+const personaLenses: Record<Persona, { label: string; objective: string }> = {
+  Executive: { label: 'OUTCOMES + INVESTMENT', objective: 'See portfolio risk, investment priorities, delivery confidence and accountable value.' },
+  Architect: { label: 'BOUNDARIES + DECISIONS', objective: 'See system boundaries, dependencies, target design choices and governance controls.' },
+  Developer: { label: 'IMPLEMENTATION + PROOF', objective: 'See bounded engineering tasks, code changes, tests and delivery evidence.' },
+}
 type Scene = 'possibility' | 'brief' | 'framework' | 'packs' | 'demos' | 'xray' | 'fleet' | 'plan' | 'transform' | 'validate' | 'time' | 'scale'
 type DemoId = 'eshop' | 'contoso' | 'petclinic'
 type DemoPhase = 'before' | 'plan' | 'after'
@@ -316,7 +322,12 @@ function MissionControl() {
       <span><i /> {autoDemo ? 'AUTONOMOUS DEMO RUNNING' : 'PRESENTER CONTROL'}</span>
       <span className="app-status"><b>{scene === 'packs' ? 'ACTIVE PACK' : 'ACTIVE MISSION'}</b> {activeStatus}</span>
       <button className="autoplay-toggle" disabled={!autoplayAvailable} onClick={() => setAutoDemo((value) => !value)}>{autoDemo ? <Pause /> : <Play />} {autoDemo ? 'PAUSE' : autoplayAvailable ? 'AUTOPLAY' : 'MANUAL ONLY'}</button>
-      <div className="persona-switch"><small>VIEW AS</small>{(['Executive', 'Architect', 'Developer'] as Persona[]).map((item) => <button key={item} className={persona === item ? 'active' : ''} onClick={() => setPersona(item)}>{item}</button>)}</div>
+      <div className="persona-switch" aria-label="Choose audience lens"><small>AUDIENCE LENS</small>{(['Executive', 'Architect', 'Developer'] as Persona[]).map((item) => <button type="button" key={item} className={persona === item ? 'active' : ''} aria-pressed={persona === item} onClick={() => setPersona(item)}>{item}</button>)}</div>
+    </div>
+
+    <div className="persona-context" role="status" aria-live="polite">
+      <b>{persona.toUpperCase()} · {personaLenses[persona].label}</b>
+      <span>{personaLenses[persona].objective}</span>
     </div>
 
     <main className="mc-main">

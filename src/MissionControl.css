@@ -70,6 +70,9 @@ button { color: inherit; }
 .persona-switch small { margin-right: 8px; color: var(--cp-text-soft); }
 .persona-switch button { height: 27px; padding: 0 10px; border: 1px solid transparent; background: transparent; color: var(--cp-text-muted); font-size: 9px; cursor: pointer; }
 .persona-switch button.active { color: var(--cp-link); border-color: var(--cp-link); background: var(--cp-highlight); }
+.persona-context { min-height: 34px; padding: 7px max(18px, calc((100vw - 1540px) / 2)); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--cp-border); background: color-mix(in srgb, var(--cp-link) 5%, var(--cp-bg)); font: 10px Consolas, monospace; }
+.persona-context b { flex: none; color: var(--cp-link); font-size: 10px; }
+.persona-context span { color: var(--cp-text-muted); line-height: 1.4; }
 
 .mc-main { width: min(1540px, 100%); min-height: calc(100vh - 108px); margin: 0 auto; }
 .scene-enter { animation: scene-in .45s ease both; }
@@ -363,6 +366,7 @@ button { color: inherit; }
 @media (max-width: 780px) {
   .mobile-nav button, .mobile-nav a { font-size: 11px; font-weight: 700; }
   .phase-switch button { font-size: 11px; font-weight: 700; }
+  .persona-context { align-items: flex-start; flex-direction: column; gap: 2px; padding: 8px 10px; }
   .agent-node { min-height: 74px; }
   .agent-node span { overflow-wrap: anywhere; line-height: 1.25; }
   .editor-shell { overflow: hidden; }
